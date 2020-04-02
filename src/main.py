@@ -6,6 +6,7 @@ import os
 
 import ronto
 import ronto.init
+import ronto.docker
 
 def main():
 
@@ -25,6 +26,7 @@ def main():
     subparsers = parser.add_subparsers(help='sub-command help')
 
     ronto.init.add_command(subparsers)
+    ronto.docker.add_command(subparsers)
 
     args = parser.parse_args()
     ronto.set_verbosity(args.verbose)

@@ -1,0 +1,12 @@
+# Section defaults
+version: 1
+defaults:
+  MANIFEST: 'default.xml'
+docker:
+  # image: almedso/yocto-bitbaker:latest # the default
+  # indicates that a privatized image is to be used
+  privatized_image:  # my-yocto-bitbaker # the default
+init:
+  repo:
+    url: URL
+    manifest: MANIFEST
