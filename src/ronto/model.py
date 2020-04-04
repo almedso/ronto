@@ -1,4 +1,3 @@
-
 import os
 import yaml
 
@@ -39,10 +38,11 @@ def env_val(key, value):
 
 def update_defaults():
     """
-    # Section defaults
+    Section defaults to deal with, like:
+
     defaults:
-      FOO: 'foo'
-      BAR: 'bar'
+        FOO: 'foo'
+        BAR: 'bar'
     """
     global variables
     verbose('Update default variables')

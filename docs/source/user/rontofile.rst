@@ -1,25 +1,137 @@
 Rontofile Reference
 ===================
 
-An example looks like this:
+The Rontofile is the home of ronto settings.
+This name *Rontofile* plus the location in the root directory
+of the (Yocto) project is established as convention.
+It enforces two things:
 
-.. code ::
+* Projects are operated from this directory and as long as
+  the those conventions are maintained experienced developers and
+  integrators find themselves "at home" quickly.
+* One save time in providing additional parameters on the command line.
+  Thus, less tiny typing errors can be made.
 
-    # Environment variable defaults
-    defaults:
-      DL_DIR: ""
-      SSTATE_DIR: ""
-      WHITE_LIST_INJECT: ""
-      PACKAGE_FEED_HOST: ""
+Rontofile content
+-----------------
+
+The following full blown Rontofile including documentation shows the
+maximum capabilities and explains the meaning of those single values.
+
+Yaml format is used to arrange and express the settings.
+See `Wikipedia <https://en.wikipedia.org/wiki/YAML>`_ for introduction
+and `Yaml home <https://yaml.org/spec/1.2/spec.html>`_ for formal specification.
+
+If an obvious content line is commented out, this means the given value
+is taken as a default. There is no need to have this setting part of
+the Rontofile, it will assemble a compact presentation.
+
+.. code :: yaml
+
+    ## docker is a toplevel item. if present, building is delegated
+    ## to a docker container, otherwise the local machine is used to
+    ## build.
+    docker:
+
+      ## Docker image that contains the Yocto requirements for building plus
+      ## ronto tool (this tool) and optionally if desired the google repo tool.
+      # image: almedso/yocto-bitbaker:latest
+
+      ## Privatized_image item indicates that a privatized image is to be used
+      ## if it is present. If additionally an image name is given, this image
+      ## name is used instead of the default.
+      ## privatized images are needed if sources need to be pulled where access
+      ## credentials (ssh key pairs) are required. Only in privatized build
+      ## containers ssh key pairs and ssh configuration can be injected.
+      ## privatized means: a user 'yocto' exists that has the same uid:gid like
+      ## the invoking user. The users home directory is '/home/yocto'.
+      ## Yocto builds cannot be executed as root.
+      privatized_image: # my-yocto-bitbaker
+
+      ## The docker container requires several volumes to be injected.
+      ## Per volume mapping there is the directory name/volume name on
+      ## the _host_ side and the directory name on the _container_ side.
+      ## The respective names are arranged along those keys.
+
+      ## A project root directory must be injected as volume to the container.
+      ## On the host side the directory is always the project directory (as
+      ## the name suggests. It cannot be configured differently.
+      # project_dir: /yocto/root
+
+      ## The cache directory is the optional.
+      ## If not given, all caching is done inside the container and thrown
+      ## away when the container is destroyed.
+      ## The site.conf script should set download cache (DL_DIR) and
+      ## Shared state cache (SSTATE_DIR) to directories below this directory
+      # cache_dir:
+        # host: $(pwd)/../cache  ## one level up the project directory
+        # container: /yocto/cache  ## interacts with side.conf settings
+
+      ## If a publishing dir is given publishing of results (images or packages)
+      ## is possible. This means images or packages are copied/rsynced
+      ## to the respective container path. and would show up on the host path.
+      # publish_dir:
+        # host: volume or path
+        ## Used as default by this script
+        # container: /yocto/publish
+
+    ## if repo is set the google repo tool is used to pull sources from
+    ## upstream and locally. It requires the repo tool installed.
+    ## the url parameter is mandatory.
     repo:
-      url:
-      manifest:
-      branch:
+      url: git@github.com:group/manifest-repo.git  ## replace by your url
+      # manifest: default.xml
+      # branch: master
+
+    ## If repo is not used: Alternative source definition is used
+    ## Only if not available the sources are pulled an update does not happen
+    # source:
+    #   - source_dir: sources/poky
+    #     git_url: git://git.yoctoproject.org/poky
+    #   - source_dir: sources/my-source
+    #     git_url: ssh://my-git-host.io/my-path
+    ## The build section
     build:
-      download: {{ DL_DIR }}
-      shared_state: {{ SSTATE_DIR }}
-      distro: {{
-      inject: {{ WHITE_LIST_INJECT }}
+      ## The init script needs to be sourced to prepare the environment to
+      ## run bitbake. The default poky script is used if nothing is given
+      # init_script: sources/poky/oe-init-build-env
+
+      ## if not set no template dir is injected and the defaults from poky are
+      ## used. This is the place to inject custom local.conf(.sample) and
+      ## custom bblayers.conf(.sample)
+      # template_dir:
+
+      ## site.conf is used to establish site specific settings
+      ## There are different strategies to deal with
+      ## If not given site.conf is ignored.
+      site:
+        ## Default behavior is conservative. if a site.conf file exists in
+        ## build/conf directory it is left untouched.
+        ## if it is not available it is created by file/generated settings
+        ## if overwrite is given site.conf is always overwritten
+        ## in build/conf directory
+        # overwrite: false
+
+        ## Use a file to establish build/conf/site.conf
+        ## if nothing else is given file is the default strategy to establish
+        ## site.conf
+        # file: site.conf  ## path is relative to project root directory
+
+        ## Generate build/conf/site.conf from values
+        ## to do
+        ## either with semantics for distro, upstream, download, sstate_cache
+        ## or from list of define strings
+        generate:
+          download: "download"
+          shared_state: "shared-state"
+          distro: "{{ ams }}"
+
+      ## todo
+      #flags:
+      #  - cleanconf
+      #  - cleanbuild
+      #  - cleansstate
+
       targets:
         - image: ams-image
           machine: roderigo
@@ -27,6 +139,44 @@ An example looks like this:
         - image: ams-image
           machine: roderigo
           publish: yes
+
+    ## Package publishing
     publish:
+      host_directory: xxx
       package_feed_host: {{ PACKAGE_FEED_HOST }}
       copy_base_url: {{ PUBLISH_BASE_URL }}
+
+
+Variables
+---------
+
+Definitions can be overwritten by environment variables.
+There are two constraints:
+
+* Each used environment variable must be listed in the default
+  section.
+* A default value must be given for every environment variable.
+  In case a certain environment variable is not set, this default
+  is used.
+
+Assuming on the shell the SSTATE_DIR environment variable is set:
+
+.. code :: (shell)
+
+    export SSTATE_DIR=/yocto/foobar
+
+and the content of the Rontofile is:
+
+.. code ::
+
+    # Environment variable defaults
+    defaults:
+      DL_DIR: "/yocto/foo"
+      SSTATE_DIR: "/yocto/bar"
+    build:
+      download: "{{ DL_DIR }}"
+      shared_state: "{{ SSTATE_DIR }}"
+
+*download* will be set to */yocto/foo* (the default) and
+*shared_state* will be set to */yocto/foobar* (obtained from the process
+environment.

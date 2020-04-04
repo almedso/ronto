@@ -2,11 +2,17 @@
 version: 1
 defaults:
   MANIFEST: 'default.xml'
-docker:
+docker:  # if defined this requests docker
   # image: almedso/yocto-bitbaker:latest # the default
   # indicates that a privatized image is to be used
   privatized_image:  # my-yocto-bitbaker # the default
+  root_dir:
+    extern:
+    # intern: /yocto/root
+repo:  # if defined this defines repo
+  url: URL
+  manifest: MANIFEST
+  branch: master
 init:
-  repo:
-    url: URL
-    manifest: MANIFEST
+  script: 
+  template:

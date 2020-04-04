@@ -12,6 +12,7 @@ It is like Yocto which is the prefix for 10^-24 of something.
    :hidden:
 
    user/index
+   architecture/index
    api/index
    dev/index
 

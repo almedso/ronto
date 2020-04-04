@@ -1,7 +1,6 @@
 User Guide
 ##########
 
-
 .. _install-guide-label:
 
 Installation and Dependencies
@@ -17,12 +16,9 @@ The simplest way to install ronto is using Pip.
 
 This will install ``ronto`` and all of its dependencies.
 
-.. include:: concept.rst
-
 .. include:: rontofile.rst
 
 .. include:: ../../../CHANGELOG.rst
-
 
 .. _report-bugs-label:
 
