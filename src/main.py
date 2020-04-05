@@ -5,8 +5,8 @@ import sys
 import os
 
 import ronto
-import ronto.init
-import ronto.docker
+import ronto.cli.init
+import ronto.cli.docker
 
 def main():
 
@@ -25,8 +25,8 @@ def main():
             help="Print program version")
     subparsers = parser.add_subparsers(help='sub-command help')
 
-    ronto.init.add_command(subparsers)
-    ronto.docker.add_command(subparsers)
+    ronto.cli.init.add_command(subparsers)
+    ronto.cli.docker.add_command(subparsers)
 
     args = parser.parse_args()
     ronto.set_verbosity(args.verbose)

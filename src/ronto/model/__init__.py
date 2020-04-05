@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from . import verbose
+from ronto import verbose
 
 model = {}
 # List of variables

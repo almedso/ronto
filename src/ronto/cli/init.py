@@ -2,8 +2,8 @@ import subprocess
 import sys
 import os
 
-from . import verbose
-from .model import read_rontofile
+from ronto import verbose
+from ronto.model import read_rontofile
 
 
 def process(args):

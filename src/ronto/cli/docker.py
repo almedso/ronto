@@ -3,8 +3,8 @@ import sys
 import os
 import tempfile
 
-from . import verbose
-from .model import read_rontofile, \
+from ronto import verbose
+from ronto.model import read_rontofile, \
         get_docker_imagename, \
         get_docker_privatized_imagename, \
         use_docker, use_privatized
