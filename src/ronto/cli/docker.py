@@ -1,64 +1,14 @@
-import subprocess
-import sys
-import os
-import tempfile
 
-from ronto import verbose
-from ronto.model import read_rontofile, \
-        get_docker_imagename, \
-        get_docker_privatized_imagename, \
-        use_docker, use_privatized
-
-
-def create_dir_and_dockerfile(yocto_bitbaker_image='almedso/yocto-bitbaker:latest'):
-    """
-    create a temporary directory and add a Dockerfile
-    to create a privatized container
-    """
-    uid = os.getuid()
-    gid = os.getgid()
-    verbose(f"Inject uid {uid} and gid {gid}")
-    dockerfile = f"""
-        FROM {yocto_bitbaker_image}
-
-        RUN groupadd --gid {gid} yocto || true && \
-        useradd --uid {uid} --gid {gid} --home /home/yocto --create-home --shell /bin/bash yocto
-
-        USER yocto
-        """
-    dir = tempfile.mkdtemp()
-    filename = os.path.join(dir, 'Dockerfile')
-    with open(filename, 'w') as f:
-        f.write(dockerfile)
-    return dir
-
-
-def cmd_run (cmd, dryrun=False):
-    if dryrun:
-        print("dry: " + " ".join(cmd))
-    else:
-        subprocess.call(cmd)
+from ronto import verbose, run_cmd
+from ronto.model import read_rontofile
+from ronto.model.docker import docker_factory
 
 
 def process(args):
-    verbose('Build privatized docker image')
-    read_rontofile(args.file)
-
-    if not use_docker() or not use_privatized():
-        print("Either docker or privatized images are not configured - abort")
-        return 1
-
-    privatized_docker_image = get_docker_privatized_imagename()
-    verbose(f"Remove potentially old image: {privatized_docker_image}")
-    cmd_run(['docker', 'rmi', privatized_docker_image ], args.dryrun)
-    yocto_docker_image = get_docker_imagename('almedso/yocto-bitbaker:latest')
-    dir = create_dir_and_dockerfile(yocto_docker_image)
-    cmd_run(['docker', 'build', '-t', privatized_docker_image, dir], args.dryrun)
-    if args.dryrun:
-        with open(os.path.join(dir, 'Dockerfile'),'r') as f:
-             print("dry: privatizing Dockerfile" + f.read())
-    os.remove(os.path.join(dir, 'Dockerfile'))  # cleanup Dockerfile
-    os.rmdir(dir)  # cleanup temporary directory
+    model = read_rontofile(args.file)
+    docker = docker_factory(model)
+    # only on docker host successful/usefull
+    docker.build_privatized_docker_image()
 
 
 def add_command(subparser):
@@ -72,7 +22,4 @@ def add_command(subparser):
             input userhome: docker -> userhome (or /home/yocto)
             output image: always my-yocto-bitbaker
             """)
-    parser.add_argument('-d', '--dryrun',
-            action='store_true',
-            help="print commands only")
     parser.set_defaults(func=process)

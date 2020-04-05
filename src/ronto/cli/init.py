@@ -4,11 +4,16 @@ import os
 
 from ronto import verbose
 from ronto.model import read_rontofile
+from ronto.model.fetcher import GitFetcher, RepoFetcher
 
 
 def process(args):
     verbose('Process init command')
-    read_rontofile(args.file)
+    model = read_rontofile(args.file)
+    git_fetcher = GitFetcher(model)
+    git_fetcher.fetch()
+    repo_fetcher = RepoFetcher(model)
+    repo_fetcher.fetch()
 
 
 def add_command(subparser):

@@ -85,7 +85,7 @@ the Rontofile, it will assemble a compact presentation.
 
     ## If repo is not used: Alternative source definition is used
     ## Only if not available the sources are pulled an update does not happen
-    # source:
+    # git:
     #   - source_dir: sources/poky
     #     git_url: git://git.yoctoproject.org/poky
     #   - source_dir: sources/my-source
