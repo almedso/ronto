@@ -11,6 +11,11 @@ import sys
 verbose_flag = False
 dryrun_flag = False
 
+
+def dryrun():
+    return dryrun_flag
+
+
 def set_verbosity(flag):
     global verbose_flag
     print(f"verbose {flag}")

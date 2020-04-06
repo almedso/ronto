@@ -9,9 +9,13 @@ docker:  # if defined this requests docker
   root_dir:
     extern:
     # intern: /yocto/root
-repo:
-  url: git@github.com:almedso/repo-yocto.git
-# git:
-init:
-  script:
-  template:
+#repo:
+#  url: git@github.com:almedso/repo-yocto.git
+git:
+build:
+  # init_script: foo-bar.sh
+  # template_dir: bar-foo/bla
+  # build_dir: bingo
+  site:
+    overwrite: True
+    # file: site.conff

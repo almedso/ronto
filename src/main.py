@@ -8,6 +8,7 @@ import traceback
 import ronto
 import ronto.cli.init
 import ronto.cli.docker
+import ronto.cli.build
 
 def format_exception(e):
     exception_list = traceback.format_stack()

@@ -69,14 +69,15 @@ class DockerConfig:
     def get_image(cls):
         return cls.image
 
-    def get_privatized_image():
+    def get_privatized_image(cls):
         return cls.image
 
     def use_docker(cls):
         return cls._use_docker
 
-    def use_privatized():
+    def use_privatized(cls):
         return cls._use_privatized
+
 
 class DockerInterface(ABC):
     """Public Interface only"""
@@ -88,6 +89,13 @@ class DockerInterface(ABC):
     def build_privatized_docker_image(self):
         pass
 
+    @abstractmethod
+    def start_container(self):
+        pass
+
+    @abstractmethod
+    def run_command(self, command, args):
+        pass
 
 
 class NoDocker(DockerInterface):
@@ -100,6 +108,13 @@ class NoDocker(DockerInterface):
         print('Docker not configured in Rontofile - abort')
         sys.exit(2)
 
+    def start_container(self):
+        verbose("No Docker configured - do not start container")
+
+    def run_command(self, command, args):
+        verbose(f"No Docker - run command {command}")
+
+
 class InsideContainer(DockerInterface):
     """Used when runs inside the container"""
 
@@ -110,6 +125,12 @@ class InsideContainer(DockerInterface):
     def build_privatized_docker_image(self):
         print('Does not make sense inside a container')
         sys.exit(2)
+
+    def start_container(self):
+        verbose("Inside Container - do not start container")
+
+    def run_command(self, command, args):
+        verbose(f"Inside Container - run command {command}")
 
 
 def create_dir_and_dockerfile(yocto_bitbaker_image='almedso/yocto-bitbaker:latest'):
@@ -147,7 +168,7 @@ class DockerHost(DockerInterface):
     def build_privatized_docker_image(self):
         verbose('Build privatized docker image')
 
-        if not use_privatized():
+        if not self.config.use_privatized():
             print("A privatized image are not configured - abort")
             return 1
 
@@ -162,6 +183,20 @@ class DockerHost(DockerInterface):
                 print("dry: privatizing Dockerfile" + f.read())
         os.remove(os.path.join(dir, 'Dockerfile'))  # cleanup Dockerfile
         os.rmdir(dir)  # cleanup temporary directory
+
+    def start_container(self):
+        verbose("Start docker container")
+        run_cmd(['docker', 'run', '--rm',
+                '--user', f"{os.getuid()}:{os.getgid()}",
+                '--volume', f"{os.getcwd()}:{self.config.project_dir_container}",
+                '--volume', f"{self.config.cache_dir_host}:{self.config.cache_dir_container}",
+                # ssh dirs
+                # publish dir
+                self.config.privatized_image, 'loop-command'
+        ])
+
+    def run_command(self, command, args):
+        verbose(f"Docker host - run command {command}")
 
 
 def docker_factory(model):

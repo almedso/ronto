@@ -137,18 +137,6 @@ as well as what kind of clean is applied before building.
         ## site.conf
         file: site.conf  ## path is relative to project root directory
 
-<<<<<<< HEAD
-        ## Generate build/conf/site.conf from values
-        ## to do
-        ## either with semantics for distro, upstream, download, sstate_cache
-        ## or from list of define strings
-        # generate:
-        #  download: "download"
-        #  shared_state: "shared-state"
-        #  distro: "{{ ams }}"
-
-=======
->>>>>>> 7783cc8... to docu
 Build Targets
 .............
 
