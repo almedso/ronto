@@ -55,6 +55,16 @@ is as follows.
       (venv) is used to indicate when the commands should be run within the
       virtual environment containing the development dependencies.
 
+* Prepare your virtual environment for development:
+
+  .. code-block :: console
+
+      (venv) $ python setup.py develop
+      (venv) $ pip install -r requirements.dev.txt
+
+  The *requirements.dev.txt* contains tools like coverage that are needed to
+  test, docs, etc.
+
 * Develop fix or enhancement:
 
   * Make a fix or enhancement (e.g. modify a class, method, function, module,

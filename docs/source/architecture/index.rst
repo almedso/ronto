@@ -16,4 +16,6 @@ Nevertheless, it is the home to understand some backgrounds, ideas better.
 
     This section does not claim to be up to date.
 
-.. include:: concept.rst
+.. include :: concept.rst
+
+.. include :: openissues.rst

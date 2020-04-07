@@ -45,6 +45,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+docs/source/coverage
 
 # Translations
 *.mo
@@ -67,6 +68,7 @@ instance/
 docs/_build/
 docs/build/
 docs/source/api/
+docs/source/coverage
 
 # PyBuilder
 target/

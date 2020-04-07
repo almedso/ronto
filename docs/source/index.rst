@@ -13,8 +13,8 @@ It is like Yocto which is the prefix for 10^-24 of something.
 
    user/index
    architecture/index
-   api/index
    dev/index
+   api/modules
 
 
 Quick Start

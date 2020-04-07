@@ -35,7 +35,7 @@ the Rontofile, it will assemble a compact presentation.
 
       ## Docker image that contains the Yocto requirements for building plus
       ## ronto tool (this tool) and optionally if desired the google repo tool.
-      # image: almedso/yocto-bitbaker:latest
+      image: almedso/yocto-bitbaker:latest
 
       ## Privatized_image item indicates that a privatized image is to be used
       ## if it is present. If additionally an image name is given, this image
@@ -56,50 +56,70 @@ the Rontofile, it will assemble a compact presentation.
       ## A project root directory must be injected as volume to the container.
       ## On the host side the directory is always the project directory (as
       ## the name suggests. It cannot be configured differently.
-      # project_dir: /yocto/root
+      project_dir: /yocto/root
 
       ## The cache directory is the optional.
       ## If not given, all caching is done inside the container and thrown
       ## away when the container is destroyed.
       ## The site.conf script should set download cache (DL_DIR) and
       ## Shared state cache (SSTATE_DIR) to directories below this directory
-      # cache_dir:
-        # host: $(pwd)/../cache  ## one level up the project directory
-        # container: /yocto/cache  ## interacts with side.conf settings
+      cache_dir:
+        host: $(pwd)/../cache  ## one level up the project directory
+        container: /yocto/cache  ## interacts with side.conf settings
 
       ## If a publishing dir is given publishing of results (images or packages)
       ## is possible. This means images or packages are copied/rsynced
       ## to the respective container path. and would show up on the host path.
-      # publish_dir:
-        # host: volume or path
+      publish_dir:
+        host: volume or path
         ## Used as default by this script
-        # container: /yocto/publish
+        container: /yocto/publish
 
     ## if repo is set the google repo tool is used to pull sources from
     ## upstream and locally. It requires the repo tool installed.
     ## the url parameter is mandatory.
     repo:
       url: git@github.com:group/manifest-repo.git  ## replace by your url
-      # manifest: default.xml
-      # branch: master
+      ## optional manifest default is default.xml
+      manifest: default.xml
+      ## optional branch default is master
+      branch: master
 
-    ## If repo is not used: Alternative source definition is used
-    ## Only if not available the sources are pulled an update does not happen
-    # git:
-    #   - source_dir: sources/poky
-    #     git_url: git://git.yoctoproject.org/poky
-    #   - source_dir: sources/my-source
-    #     git_url: ssh://my-git-host.io/my-path
+    ## If repo is not used: Alternative source definition is via repo.
+    ## Only if not locally available yet the sources are pulled
+    ## If a source directory is available no update is performed
+    git:
+      ## in case the list of git repositories is empty the following (poky)
+      ## is picked as a default
+      - source_dir: sources/poky  # this entry is used if the list is empty
+        git_url: git://git.yoctoproject.org/poky  # same here
+      ## more than one repository are possible like below
+      - source_dir: sources/meta-openembedded
+        git_url: https://github.com/openembedded/meta-openembedded
+
+Build Processing Specification
+..............................
+
+This section clarifies how configuration files (local.con, bblayers.conf,
+site.conf) are created/updated, how the build directory structure looks like
+as well as what kind of clean is applied before building.
+
+.. code :: yaml
+
     ## The build section
     build:
       ## The init script needs to be sourced to prepare the environment to
       ## run bitbake. The default poky script is used if nothing is given
-      # init_script: sources/poky/oe-init-build-env
+      init_script: sources/poky/oe-init-build-env
 
       ## if not set no template dir is injected and the defaults from poky are
       ## used. This is the place to inject custom local.conf(.sample) and
       ## custom bblayers.conf(.sample)
-      # template_dir:
+      template_dir: sources/poky/meta-poky/conf
+
+      ## If not set the default "build" as specified in the poky init script is
+      ## used. Most likely it is not subject to change.
+      build_dir: build
 
       ## site.conf is used to establish site specific settings
       ## There are different strategies to deal with
@@ -110,36 +130,48 @@ the Rontofile, it will assemble a compact presentation.
         ## if it is not available it is created by file/generated settings
         ## if overwrite is given site.conf is always overwritten
         ## in build/conf directory
-        # overwrite: false
+        overwrite: false
 
         ## Use a file to establish build/conf/site.conf
         ## if nothing else is given file is the default strategy to establish
         ## site.conf
-        # file: site.conf  ## path is relative to project root directory
+        file: site.conf  ## path is relative to project root directory
 
+<<<<<<< HEAD
         ## Generate build/conf/site.conf from values
         ## to do
         ## either with semantics for distro, upstream, download, sstate_cache
         ## or from list of define strings
-        generate:
-          download: "download"
-          shared_state: "shared-state"
-          distro: "{{ ams }}"
+        # generate:
+        #  download: "download"
+        #  shared_state: "shared-state"
+        #  distro: "{{ ams }}"
 
-      ## todo
-      #flags:
-      #  - cleanconf
-      #  - cleanbuild
-      #  - cleansstate
+=======
+>>>>>>> 7783cc8... to docu
+Build Targets
+.............
 
-      targets:
-        - image: ams-image
-          machine: roderigo
-          publish: yes
-        - image: ams-image
-          machine: roderigo
-          publish: yes
+Build targets are best defined in the meta layer where machines and images
+are defined. This is where they belong to.
 
+.. code :: yaml
+
+    targets:
+      - image: ams-image
+        machine: roderigo
+        publish: yes
+      - image: ams-image
+        machine: roderigo
+        publish: yes
+
+
+Publishing
+..........
+
+.. code :: yaml
+
+    ## -- Not implemented yet --
     ## Package publishing
     publish:
       host_directory: xxx

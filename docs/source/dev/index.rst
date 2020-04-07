@@ -61,8 +61,6 @@ Use the Makefile convenience rule to run the tests.
 
     (venv) $ make check-coverage
 
-The test code coverage report can be found `here <../coverage/coverage.html>`_
-
 
 .. _style-compliance-label:
 
