@@ -51,6 +51,9 @@ docs/source/coverage
 *.mo
 *.pot
 
+# misc
+sources/
+
 # Django stuff:
 *.log
 .static_storage/
