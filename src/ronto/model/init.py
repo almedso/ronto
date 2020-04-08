@@ -2,7 +2,7 @@ import os
 from shutil import copyfile, rmtree
 from abc import ABC, abstractmethod
 
-from ronto import verbose, dryrun_flag, run_cmd
+from ronto import verbose, dryrun, run_cmd
 
 
 def get_init_build_dir(model):
@@ -67,7 +67,7 @@ class SiteConfigHandler:
             if (self.overwrite or overwrite_site) \
             and os.path.isfile(src_site_conf_file):
                 verbose(f"Overwrite site.conf")
-                if dryrun_flag:
+                if dryrun():
                     print(f"copy {src_site_conf_file} to {dest_site_conf_file}")
                 else:
                     copyfile(src_site_conf_file, dest_site_conf_file)
@@ -77,7 +77,7 @@ class SiteConfigHandler:
             if os.path.isfile(src_site_conf_file):
                 os.makedirs(dest_config_dir, exist_ok=True)
                 verbose(f"Create site.conf from: {src_site_conf_file}")
-                if dryrun_flag:
+                if dryrun():
                     print(f"copy {src_site_conf_file} to {dest_site_conf_file}")
                 else:
                     copyfile(src_site_conf_file, dest_site_conf_file)

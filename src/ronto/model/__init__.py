@@ -3,16 +3,21 @@ import yaml
 
 from ronto import verbose
 
-model = {}
+# module global variable
+model_ = {}
 # List of variables
 variables = {}
 
+
+def get_model():
+    return model_
+
+
 def read_rontofile(file):
-    global model
+    global model_
     verbose('Read Rontofile.yml')
-    model = yaml.load(file, Loader=yaml.FullLoader)
+    model_ = yaml.load(file, Loader=yaml.FullLoader)
     update_defaults()
-    return model
 
 
 def env_val(key, value):
@@ -35,6 +40,6 @@ def update_defaults():
     """
     global variables
     verbose('Update default variables')
-    if 'defaults' in model and isinstance(model['defaults'], dict):
-        for default in model['defaults']:
-            variables[default] = env_val(default, model['defaults'][default])
+    if 'defaults' in model_ and isinstance(model_['defaults'], dict):
+        for default in model_['defaults']:
+            variables[default] = env_val(default, model_['defaults'][default])

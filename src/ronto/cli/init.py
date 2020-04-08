@@ -3,32 +3,25 @@ import sys
 import os
 
 from ronto import verbose
-from ronto.model import read_rontofile
+from ronto.model import get_model
 from ronto.model.fetcher import GitFetcher, RepoFetcher
 from ronto.model.init import SiteConfigHandler, run_init, clean_init
-
-from ronto.model.docker import docker_factory
-
-def process_xxx(args):
-    model = read_rontofile(args.file)
-    docker = docker_factory(model)
-    # only on docker host successful/usefull
-    docker.start_container()
-    docker.run_command('init', args)
+from ronto.model.docker import docker_context
 
 
+
+@docker_context()
 def process(args):
     verbose('Process init command')
-    model = read_rontofile(args.file)
-    git_fetcher = GitFetcher(model)
+    git_fetcher = GitFetcher(get_model())
     git_fetcher.fetch()
-    repo_fetcher = RepoFetcher(model)
+    repo_fetcher = RepoFetcher(get_model())
     repo_fetcher.fetch()
-    clean_init(model,
+    clean_init(get_model(),
         rebuild_conf=args.rebuild_conf,
         clean_build_dir=args.clean_build)
-    run_init(model)
-    siteconf = SiteConfigHandler(model)
+    run_init(get_model())
+    siteconf = SiteConfigHandler(get_model())
     siteconf.handle(args.overwrite_site)
 
 

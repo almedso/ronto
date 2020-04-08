@@ -15,10 +15,8 @@ dryrun_flag = False
 def dryrun():
     return dryrun_flag
 
-
 def set_verbosity(flag):
     global verbose_flag
-    print(f"verbose {flag}")
     verbose_flag = flag
 
 def verbose(*args):
@@ -28,7 +26,6 @@ def verbose(*args):
 
 def set_dryrun(flag):
     global dryrun_flag
-    print(f"dryrun {flag}")
     dryrun_flag = flag
 
 def run_cmd(cmd):

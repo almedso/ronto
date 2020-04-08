@@ -3,18 +3,19 @@ import sys
 import os
 
 from ronto import verbose
-from ronto.model import read_rontofile
+from ronto.model import get_model
 from ronto.model.fetcher import GitFetcher, RepoFetcher
 from ronto.model.builder import InteractiveBuilder, TargetBuilder
+from ronto.model.docker import docker_context
 
 
+@docker_context()
 def process(args):
     verbose('Process build command')
-    model = read_rontofile(args.file)
     if args.interactive:
-        builder = InteractiveBuilder(model)
+        builder = InteractiveBuilder(get_model())
     else:
-        builder = TargetBuilder(model, args.targets)
+        builder = TargetBuilder(get_model(), args.targets)
     builder.build()
 
 

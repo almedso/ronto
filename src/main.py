@@ -10,6 +10,9 @@ import ronto.cli.init
 import ronto.cli.docker
 import ronto.cli.build
 
+from ronto.model import read_rontofile
+
+
 def format_exception(e):
     exception_list = traceback.format_stack()
     exception_list = exception_list[:-2]
@@ -52,7 +55,7 @@ def main():
         args = parser.parse_args()
         ronto.set_verbosity(args.verbose)
         ronto.set_dryrun(args.dryrun)
-
+        read_rontofile(args.file)
         if 'func' in args:
                 args.func(args)
         else:

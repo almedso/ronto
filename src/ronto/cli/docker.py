@@ -1,15 +1,20 @@
 
 from ronto import verbose, run_cmd
-from ronto.model import read_rontofile
+from ronto.model import get_model
 from ronto.model.docker import docker_factory
 
 
 def process(args):
-    model = read_rontofile(args.file)
-    docker = docker_factory(model)
+    docker = docker_factory(get_model())
     # only on docker host successful/usefull
-    docker.build_privatized_docker_image()
-
+    if docker:
+        docker.build_privatized_docker_image()
+        docker.create_container()
+        docker.start_container()
+        docker.run_command(args.cmd)
+        docker.stop_container()
+    else:
+        verbose("No docker environment")
 
 def add_command(subparser):
     parser = subparser.add_parser('docker', help="""
@@ -22,4 +27,7 @@ def add_command(subparser):
             input userhome: docker -> userhome (or /home/yocto)
             output image: always my-yocto-bitbaker
             """)
+    parser.add_argument('cmd',
+            help="Run command",
+            type=str)
     parser.set_defaults(func=process)

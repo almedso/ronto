@@ -2,11 +2,12 @@ import os
 import sys
 import os
 import tempfile
+import docker
 from pathlib import Path
 from abc import ABC, abstractmethod
 
-from ronto import verbose, run_cmd, dryrun_flag, is_command_available_or_exit
-from . import model
+from ronto import verbose, run_cmd, dryrun, is_command_available_or_exit
+from . import get_model
 
 
 def is_in_docker():
@@ -16,6 +17,7 @@ def is_in_docker():
         os.path.isfile(path) and any('docker' in line for line in open(path))
     )
 
+
 PROJECT_DIR_HOST = os.getcwd()
 SSH_HOST = os.path.join(str(Path.home()), '.ssh')
 
@@ -23,7 +25,6 @@ SSH_HOST = os.path.join(str(Path.home()), '.ssh')
 class DockerConfig:
 
     _use_docker = False
-    _use_privatized = False
     image = 'almedso/yocto-bitbaker:latest'
     privatized_image = 'my-yocto-bitbaker'
 
@@ -39,16 +40,20 @@ class DockerConfig:
 
             if isinstance(model['docker'], dict):
                 if 'image' in model['docker'] \
-                and isinstance(model['docker']['image'], str):
+                and isinstance(model['docker']['image'], str) \
+                and model['docker']['image'] != "":
                     cls.image =  model['docker']['image']
-                if 'privatized_image' in model['docker']:
-                    cls._use_privatized = True
-                    if isinstance(model['docker']['privatized_image'], str):
-                        cls.privatized_image = model['docker']['privatized_image']
+
+                if 'privatized_image' in model['docker'] \
+                and isinstance(model['docker']['privatized_image'], str) \
+                and model['docker']['privatized_image'] != "":
+                    cls.privatized_image = model['docker']['privatized_image']
 
                 if 'project_dir' in model['docker'] \
-                and isinstance(model['docker']['project_dir'], str):
+                and isinstance(model['docker']['project_dir'], str) \
+                and model['docker']['project_dir'] != "":
                     project_dir_container = model['docker']['project_dir']
+
                 if 'cache_dir' in model['docker'] \
                 and isinstance(model['docker']['cache_dir'], dict):
                     if 'host' in model['docker']['cache_dir'] \
@@ -57,6 +62,7 @@ class DockerConfig:
                     if 'container' in model['docker']['cache_dir'] \
                     and isinstance(model['docker']['cache_dir']['container'], str):
                         cache_dir_container = model['docker']['cache_dir']['container']
+
                 if 'publish_dir' in model['docker'] \
                 and isinstance(model['docker']['publish_dir'], dict):
                     if 'host' in model['docker']['publish_dir'] \
@@ -70,70 +76,15 @@ class DockerConfig:
         return cls.image
 
     def get_privatized_image(cls):
-        return cls.image
+        return cls.privatized_image
 
     def use_docker(cls):
         return cls._use_docker
 
-    def use_privatized(cls):
-        return cls._use_privatized
 
-
-class DockerInterface(ABC):
-    """Public Interface only"""
-
-    def __init__(self):
-        super().__init__()
-
-    @abstractmethod
-    def build_privatized_docker_image(self):
-        pass
-
-    @abstractmethod
-    def start_container(self):
-        pass
-
-    @abstractmethod
-    def run_command(self, command, args):
-        pass
-
-
-class NoDocker(DockerInterface):
-    """Basically a shortcut on everything"""
-
-    def __init__(self):
-        super().__init__()
-
-    def build_privatized_docker_image(self):
-        print('Docker not configured in Rontofile - abort')
-        sys.exit(2)
-
-    def start_container(self):
-        verbose("No Docker configured - do not start container")
-
-    def run_command(self, command, args):
-        verbose(f"No Docker - run command {command}")
-
-
-class InsideContainer(DockerInterface):
-    """Used when runs inside the container"""
-
-    def __init__(self, config):
-        self.config = config
-        super().__init__()
-
-    def build_privatized_docker_image(self):
-        print('Does not make sense inside a container')
-        sys.exit(2)
-
-    def start_container(self):
-        verbose("Inside Container - do not start container")
-
-    def run_command(self, command, args):
-        verbose(f"Inside Container - run command {command}")
-
-
-def create_dir_and_dockerfile(yocto_bitbaker_image='almedso/yocto-bitbaker:latest'):
+def create_dir_and_dockerfile(
+            yocto_bitbaker_image='almedso/yocto-bitbaker:latest',
+            yocto_user_home='/home/yocto'):
     """
     create a temporary directory and add a Dockerfile
     to create a privatized container
@@ -145,7 +96,8 @@ def create_dir_and_dockerfile(yocto_bitbaker_image='almedso/yocto-bitbaker:lates
         FROM {yocto_bitbaker_image}
 
         RUN groupadd --gid {gid} yocto || true && \
-        useradd --uid {uid} --gid {gid} --home /home/yocto --create-home --shell /bin/bash yocto
+        useradd --uid {uid} --gid {gid} --home {yocto_user_home} \
+                --create-home --shell /bin/bash yocto
 
         USER yocto
         """
@@ -156,55 +108,133 @@ def create_dir_and_dockerfile(yocto_bitbaker_image='almedso/yocto-bitbaker:lates
     return dir
 
 
-class DockerHost(DockerInterface):
-    """Only used if this runs on docker host"""
+class DockerHost:
+    """
+    Only used if this runs on docker host
+
+    As a constraint: the name of the container is the same
+    is the name of the privatized image
+    """
 
     def __init__(self, config):
         # skip totally if repo is not set.
         is_command_available_or_exit( ['docker', '--version'])
         self.config = config
-        super().__init__()
+        self.docker = docker.from_env()  # create a docker client
+        self.yocto_user_home = '/home/yocto'  # needed for consistency reasons
 
     def build_privatized_docker_image(self):
+        try:
+            image_label = self.config.privatized_image + ':latest'
+            image = self.docker.images.get(image_label)
+            verbose(f"Privatized image {image_label} exists - no need to build")
+        except docker.errors.ImageNotFound as _err:
+            self._build_privatized_docker_image()
+
+
+    def _build_privatized_docker_image(self):
         verbose('Build privatized docker image')
 
-        if not self.config.use_privatized():
-            print("A privatized image are not configured - abort")
-            return 1
-
         privatized_docker_image = self.config.get_privatized_image()
-        verbose(f"Remove potentially old image: {privatized_docker_image}")
-        run_cmd(['docker', 'rmi', privatized_docker_image ])
         yocto_docker_image = self.config.get_image()
-        dir = create_dir_and_dockerfile(yocto_docker_image)
-        run_cmd(['docker', 'build', '-t', privatized_docker_image, dir])
-        if dryrun_flag:
+        dir = create_dir_and_dockerfile(yocto_docker_image, self.yocto_user_home)
+        if dryrun():
             with open(os.path.join(dir, 'Dockerfile'),'r') as f:
                 print("dry: privatizing Dockerfile" + f.read())
+        run_cmd(['docker', 'build', '-t', privatized_docker_image, dir])
         os.remove(os.path.join(dir, 'Dockerfile'))  # cleanup Dockerfile
         os.rmdir(dir)  # cleanup temporary directory
 
-    def start_container(self):
-        verbose("Start docker container")
-        run_cmd(['docker', 'run', '--rm',
-                '--user', f"{os.getuid()}:{os.getgid()}",
-                '--volume', f"{os.getcwd()}:{self.config.project_dir_container}",
-                '--volume', f"{self.config.cache_dir_host}:{self.config.cache_dir_container}",
-                # ssh dirs
-                # publish dir
-                self.config.privatized_image, 'loop-command'
-        ])
+    def create_container(self):
+        containers = self.docker.containers.list(all=True,
+                filters={'name': self.config.privatized_image})
+        if len(containers) == 1:
+            verbose(f"Container already exists, reusing ...")
+            self.container = containers[0]
+            return
 
-    def run_command(self, command, args):
-        verbose(f"Docker host - run command {command}")
+        verbose("Create docker container")
+        volumes = {
+            os.getcwd(): { 'mode': 'rw',
+                'bind': self.config.project_dir_container,},
+            self.config.cache_dir_host: {'mode': 'rw',
+                'bind': self.config.cache_dir_container}
+        }
+        local_ssh_dir = os.path.join(Path.home(),'.ssh')
+        if os.path.isdir(local_ssh_dir):
+            # only if host (local) user has ssh configured inject
+            volumes[local_ssh_dir] = {'mode': 'ro',
+                    'bind': os.path.join(self.yocto_user_home,'.ssh')}
+        if self.config.publish_dir_host != '' \
+        and os.path.isdir(self.config.publish_dir_host):
+            # only if host (local) is configured and exists configure
+            volumes[self.config.publish_dir_host] = {'mode': 'rw',
+                'bind': self.config.publish_dir_container}
+        self.container = self.docker.containers.create(detach=True,
+                # Inject an infinite loop command
+                command="bash -c 'while true; do sleep 1; done'",
+                # auto_remove=True, # since we fix the name no need to remove
+                user=os.getuid(), read_only=True,
+                name=self.config.privatized_image,
+                image=self.config.privatized_image,
+                volumes=volumes)
+        verbose(f"Docker container created: {self.container}")
+
+    def start_container(self):
+        verbose(f"Docker container status: {self.container.status}")
+        if self.container.status != 'running':
+            verbose(f"Start docker container")
+            self.container.start()
+        # wait until container is running
+
+
+    def run_command(self, command):
+        verbose(f"Docker container status: {self.container.status}")
+        verbose(f"Docker host - run command '{command}'")
+        (exit_code, output) = self.container.exec_run(cmd=command,
+                # tty=True,
+                stdout=True, stderr=True, stream=True,
+                workdir=self.config.project_dir_container)
+        verbose(f"Command exit code: {exit_code}")
+        for line in output:
+            verbose(line.decode())
+        return output
+
+    def stop_container(self):
+        verbose(f"Docker stop container")
+        self.container.stop()
 
 
 def docker_factory(model):
     docker_config = DockerConfig(model)
     if docker_config.use_docker():
-        if is_in_docker():
-            return InsideContainer(docker_config)
-        else:
+        verbose(f"Docker context configured")
+        if not is_in_docker():
             return DockerHost(docker_config)
-    else:
-        return NoDocker()
+        else:
+            verbose(f"Run inside the container")
+            return None
+    verbose(f"Docker context not configured")
+    return None
+
+
+# a decorator that helps to run docker
+def docker_context():
+    def _docker_context(function):
+        def __docker_context(*args, **kwargs):
+            verbose(f"Docker decorator - started")
+            docker = docker_factory(get_model())
+            if docker:
+                verbose("Invoke on docker context ...")
+                docker.build_privatized_docker_image()
+                docker.create_container()
+                docker.start_container()
+                result = docker.run_command(sys.argv)
+                docker.stop_container()
+            else:
+                verbose("Do not run on docker")
+                result = function(*args, **kwargs)
+            verbose(f"Docker decorator - done")
+            return result
+        return __docker_context
+    return _docker_context
