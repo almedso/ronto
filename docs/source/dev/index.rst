@@ -131,7 +131,7 @@ Semantic versioning is applied and interpreted as follow:
     important
 * minor change: Additional options, additional fields in rontofile
     no behavior change.
-* patch change: Same behavior, bugfixes applied
+* patch change: Same behavior, bug-fixes applied
 
 Versions with major equal to zero imply an expectation of sematic instability
 in cli and ronto file.

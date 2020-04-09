@@ -43,7 +43,7 @@ if __name__ == '__main__':
         description=' Wrapper around building stuff using repotool and Yocto',
         long_description='\n\n'.join([readme, changes]),
         license='MIT license',
-        url='https://github.com/volker-kempert/ronto',
+        url='https://github.com/almedso/ronto',
         version=version,
         author='Volker Kempert',
         author_email='volker.kempert@almedso.de',
@@ -61,5 +61,14 @@ if __name__ == '__main__':
         },
         classifiers=['Development Status :: 3 - Alpha',
                      'Intended Audience :: Developers',
-                     'Programming Language :: Python :: 3.6']
+                     'Intended Audience :: Information Technology',
+                     'Topic :: Software Development :: Build Tools',
+                     'Topic :: Utilities',
+                     'Environment :: Console',
+                     'Programming Language :: Python :: 3.6'],
+        project_urls={
+            'Documentation': 'https://ronto.readthedocs.io',
+            'Bug Reports': 'https://github.com/almedso/ronto/issues',
+            'Source': 'https://github.com/almedso/ronto/',
+    }
     )

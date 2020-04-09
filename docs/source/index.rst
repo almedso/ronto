@@ -1,10 +1,20 @@
 ronto
 #####
 
-Wrapper around building stuff using repotool and Yocto.
+*ronto* is a cli tool for building stuff using repotool, Yocto and Docker.
 
-``ronto`` is the proposed prefix for 10^-27 of something.
+The *ronto* command is intended to simplify Yocto build environments and
+processes.
+It can be used by developers who just want to build a single
+recipe.
+It can also be used for headless CI builds or release builds covering a set of
+machines and images.
+All build activities can be transparently performed within a docker container
+or on bare metal.
+
+*ronto* is the proposed prefix for 10^-27 of something.
 It is like Yocto which is the prefix for 10^-24 of something.
+
 
 .. toctree::
    :maxdepth: 2

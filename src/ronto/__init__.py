@@ -2,7 +2,7 @@
  Wrapper around building stuff using repotool and Yocto
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 import subprocess
 import os
