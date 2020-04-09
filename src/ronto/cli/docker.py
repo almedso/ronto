@@ -1,4 +1,3 @@
-
 from ronto import verbose, run_cmd
 from ronto.model import get_model
 from ronto.model.docker import docker_factory
@@ -16,8 +15,11 @@ def process(args):
     else:
         verbose("No docker environment")
 
+
 def add_command(subparser):
-    parser = subparser.add_parser('docker', help="""
+    parser = subparser.add_parser(
+        "docker",
+        help="""
             Build localized docker image.
 
             Inside the personalized image a user 'yocto' exists
@@ -26,8 +28,7 @@ def add_command(subparser):
             input image: docker -> image (or almedso/yocto-bitbaker:latest)
             input userhome: docker -> userhome (or /home/yocto)
             output image: always my-yocto-bitbaker
-            """)
-    parser.add_argument('cmd',
-            help="Run command",
-            type=str)
+            """,
+    )
+    parser.add_argument("cmd", help="Run command", type=str)
     parser.set_defaults(func=process)

@@ -90,23 +90,6 @@ is as follows.
     Review the output produced in ``docs/source/coverage/coverage.html``. Add
     additional test steps, where practical, to improve coverage.
 
-  * The change should be style compliant. Perform style check.
-
-    .. code-block:: console
-
-        (venv) $ make check-style
-
-    See the :ref:`style-compliance-label` section for more information.
-
-  * The change should include type annotations where appropriate.
-    Perform type annotations check.
-
-    .. code-block:: console
-
-        (venv) $ make check-types
-
-    See the :ref:`annotations-label` section for more information.
-
   * Fix any errors or regressions.
 
 * The docs and the change log should be updated for anything but trivial bug

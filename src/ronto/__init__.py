@@ -2,7 +2,7 @@
  Wrapper around building stuff using repotool and Yocto
 """
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 import subprocess
 import os
@@ -15,18 +15,21 @@ dryrun_flag = False
 def dryrun():
     return dryrun_flag
 
+
 def set_verbosity(flag):
     global verbose_flag
     verbose_flag = flag
 
+
 def verbose(*args):
     if verbose_flag:
-        print("*** " + "".join(map(str,args)))
+        print("*** " + "".join(map(str, args)))
 
 
 def set_dryrun(flag):
     global dryrun_flag
     dryrun_flag = flag
+
 
 def run_cmd(cmd):
     if dryrun_flag:
@@ -38,7 +41,7 @@ def run_cmd(cmd):
 
 def is_command_available_or_exit(cmd):
     try:
-        with open(os.devnull, 'w') as devnull:
+        with open(os.devnull, "w") as devnull:
             subprocess.call(cmd, stdout=devnull, stderr=devnull)
     except IOError as _err:
         print(f"Program {cmd[0]} is not available - aborting", file=sys.stderr)

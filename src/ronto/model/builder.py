@@ -30,21 +30,23 @@ class InteractiveContext:
 
     def __init__(self, source_line):
         # establish the command
-        command = ['bash', '-c', f"{source_line}; $SHELL" ]
+        command = ["bash", "-c", f"{source_line}; $SHELL"]
         verbose(f"bash -c {command}")
 
         # save original tty setting then set it to raw mode
         self.old_tty = termios.tcgetattr(sys.stdin)
-        buf = array.array('h', [0, 0, 0, 0])
+        buf = array.array("h", [0, 0, 0, 0])
         fcntl.ioctl(sys.stdin, termios.TIOCGWINSZ, buf, True)
         tty.setraw(sys.stdin.fileno())
         self.master_fd, self.slave_fd = pty.openpty()
         fcntl.ioctl(self.slave_fd, termios.TIOCSWINSZ, buf)
-        self.process = subprocess.Popen(command,
-                preexec_fn=os.setsid,
-                stdin=self.slave_fd,
-                stdout=self.slave_fd,
-                stderr=self.slave_fd)
+        self.process = subprocess.Popen(
+            command,
+            preexec_fn=os.setsid,
+            stdin=self.slave_fd,
+            stdout=self.slave_fd,
+            stderr=self.slave_fd,
+        )
         # carridge return is required due to change terminal discipline
         verbose(f"Start Bash session: Pid {self.process.pid}\r")
         os.write(self.master_fd, b"export PS1='(yocto interactive build)> '\n")
@@ -74,11 +76,10 @@ class InteractiveContext:
 
 
 class BatchContext:
-
     def __init__(self, source_line):
-        self.process = subprocess.Popen('bash',
-                preexec_fn=os.setsid,
-                stdin=subprocess.PIPE)
+        self.process = subprocess.Popen(
+            "bash", preexec_fn=os.setsid, stdin=subprocess.PIPE
+        )
         verbose(f"Start Bash session: Pid {self.process.pid}")
         self.run_context(source_line)
 
@@ -87,11 +88,11 @@ class BatchContext:
             print(f"dry - Run build command: {command}")
         else:
             verbose(f"Run command: {command}")
-            command += '\n'
+            command += "\n"
             self.process.stdin.write(command.encode())
 
     def terminate(self):
-        self.run_context('exit')
+        self.run_context("exit")
         self.process.communicate()  # wait until exit is processed
         verbose(f"Stop bash session: Pid {self.process.pid}")
         self.process.terminate()  # maybe that is to much
@@ -102,17 +103,16 @@ class BatchContext:
 
 
 class Builder:
-
     def __init__(self, model):
         script = get_init_script(model)
         template_dir = get_init_template_dir(model)
         self.build_dir = get_init_build_dir(model)
 
-        source_line = ''
+        source_line = ""
         if template_dir != None:
-            source_line += 'TEMPLATECONF='
-            source_line += os.path.join(os.getcwd(), template_dir) + ' '
-        source_line += 'source ' + script + ' ' + self.build_dir
+            source_line += "TEMPLATECONF="
+            source_line += os.path.join(os.getcwd(), template_dir) + " "
+        source_line += "source " + script + " " + self.build_dir
         verbose(f"Builder init sourcing: {source_line}")
         self.source_line = source_line
         super().__init__()
@@ -121,33 +121,41 @@ class Builder:
 def get_targets(model):
     targets = []
     verbose("Check for defined targets")
-    if 'build' in model and isinstance(model['build'], dict) \
-    and 'targets' in model['build'] \
-    and isinstance(model['build']['targets'], list):
-        for target in model['build']['targets']:
+    if (
+        "build" in model
+        and isinstance(model["build"], dict)
+        and "targets" in model["build"]
+        and isinstance(model["build"]["targets"], list)
+    ):
+        for target in model["build"]["targets"]:
             verbose(f"  Found target: {target}")
-            if isinstance(target, dict) \
-            and 'machine' in target and isinstance(target['machine'], str) \
-            and 'image' in target and isinstance(target['image'], str):
+            if (
+                isinstance(target, dict)
+                and "machine" in target
+                and isinstance(target["machine"], str)
+                and "image" in target
+                and isinstance(target["image"], str)
+            ):
                 targets.append(target)
     if len(targets) == 0:
         verbose("  No target found -> use default target")
         # Add a default machine/image combination as of yocto docu
         # getting started section.
-        targets.append({'machine': 'qemux86',
-                        'image': 'core-image-sato'})
+        targets.append({"machine": "qemux86", "image": "core-image-sato"})
     return targets
 
 
 def get_packageindex(model):
-    if 'build' in model and isinstance(model['build'], dict) \
-    and 'packageindex' in model['build']:
-         return True if model['build']['packageindex'] else False
+    if (
+        "build" in model
+        and isinstance(model["build"], dict)
+        and "packageindex" in model["build"]
+    ):
+        return True if model["build"]["packageindex"] else False
     return True  # The default is to create package index
 
 
 class TargetBuilder(Builder):
-
     def __init__(self, model, _target):
         verbose(f"Target Builder")
         super().__init__(model)
@@ -158,8 +166,9 @@ class TargetBuilder(Builder):
     def build(self):
         for target in self.targets:
             verbose(f"Build {target['image']} for {target['machine']}")
-            self.context.run_context( \
-                f"MACHINE={target['machine']} bitbake {target['image']}")
+            self.context.run_context(
+                f"MACHINE={target['machine']} bitbake {target['image']}"
+            )
         if self.do_packageindex:
             verbose("Do package index")
             self.context.run_context("bitbake package-index")
@@ -167,7 +176,6 @@ class TargetBuilder(Builder):
 
 
 class InteractiveBuilder(Builder):
-
     def __init__(self, model):
         verbose(f"Interactive Builder")
         super().__init__(model)

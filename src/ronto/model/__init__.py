@@ -15,7 +15,7 @@ def get_model():
 
 def read_rontofile(file):
     global model_
-    verbose('Read Rontofile.yml')
+    verbose("Read Rontofile.yml")
     model_ = yaml.load(file, Loader=yaml.FullLoader)
     update_defaults()
 
@@ -39,7 +39,7 @@ def update_defaults():
         BAR: 'bar'
     """
     global variables
-    verbose('Update default variables')
-    if 'defaults' in model_ and isinstance(model_['defaults'], dict):
-        for default in model_['defaults']:
-            variables[default] = env_val(default, model_['defaults'][default])
+    verbose("Update default variables")
+    if "defaults" in model_ and isinstance(model_["defaults"], dict):
+        for default in model_["defaults"]:
+            variables[default] = env_val(default, model_["defaults"][default])

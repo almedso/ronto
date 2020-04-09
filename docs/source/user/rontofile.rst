@@ -26,54 +26,20 @@ If an obvious content line is commented out, this means the given value
 is taken as a default. There is no need to have this setting part of
 the Rontofile, it will assemble a compact presentation.
 
+Build Source Specification
+..........................
+
+Build sources (or configuration sources or just sources) are all
+Yocto layers, classes, recipes and configurations needed to build something
+using Yocto. The *ronto* tool allows to specify
+
+* nothing - it is up to manual configuration out of scope from *ronto*.
+* a set of git repositories - *ronto* supports initial cloning only.
+* a manifest repository - *ronto* invokes google repo tool to init and sync.
+
+A mix is possible although not really recommended.
+
 .. code :: yaml
-
-    ## docker is a toplevel item. if present, building is delegated
-    ## to a docker container, otherwise the local machine is used to
-    ## build.
-    docker:
-
-      ## Docker image that contains the Yocto requirements for building plus
-      ## ronto tool (this tool) and optionally if desired the google repo tool.
-      image: almedso/yocto-bitbaker:latest
-
-      ## Privatized_image item indicates that a privatized image is to be used
-      ## if it is present. If additionally an image name is given, this image
-      ## name is used instead of the default.
-      ## privatized images are needed if sources need to be pulled where access
-      ## credentials (ssh key pairs) are required. Only in privatized build
-      ## containers ssh key pairs and ssh configuration can be injected.
-      ## privatized means: a user 'yocto' exists that has the same uid:gid like
-      ## the invoking user. The users home directory is '/home/yocto'.
-      ## Yocto builds cannot be executed as root.
-      privatized_image: # my-yocto-bitbaker
-
-      ## The docker container requires several volumes to be injected.
-      ## Per volume mapping there is the directory name/volume name on
-      ## the _host_ side and the directory name on the _container_ side.
-      ## The respective names are arranged along those keys.
-
-      ## A project root directory must be injected as volume to the container.
-      ## On the host side the directory is always the project directory (as
-      ## the name suggests. It cannot be configured differently.
-      project_dir: /yocto/root
-
-      ## The cache directory is the optional.
-      ## If not given, all caching is done inside the container and thrown
-      ## away when the container is destroyed.
-      ## The site.conf script should set download cache (DL_DIR) and
-      ## Shared state cache (SSTATE_DIR) to directories below this directory
-      cache_dir:
-        host: $(pwd)/../cache  ## one level up the project directory
-        container: /yocto/cache  ## interacts with side.conf settings
-
-      ## If a publishing dir is given publishing of results (images or packages)
-      ## is possible. This means images or packages are copied/rsynced
-      ## to the respective container path. and would show up on the host path.
-      publish_dir:
-        host: volume or path
-        ## Used as default by this script
-        container: /yocto/publish
 
     ## if repo is set the google repo tool is used to pull sources from
     ## upstream and locally. It requires the repo tool installed.
@@ -166,6 +132,62 @@ Publishing
       package_feed_host: {{ PACKAGE_FEED_HOST }}
       copy_base_url: {{ PUBLISH_BASE_URL }}
 
+Using Docker
+............
+
+*ronto* is capable to delegate all builds to a docker container, running
+a docker image with Yocto prerequisites installed.
+*ronto* takes over container management (image download, creation),
+container startup and volume injection and build execution transparently.
+
+.. code :: yaml
+
+    ## docker is a toplevel item. if present, building is delegated
+    ## to a docker container, otherwise the local machine is used to
+    ## build.
+    docker:
+
+      ## Docker image that contains the Yocto requirements for building plus
+      ## ronto tool (this tool) and optionally if desired the google repo tool.
+      image: almedso/yocto-bitbaker:latest
+
+      ## Privatized_image item indicates that a privatized image is to be used
+      ## if it is present. If additionally an image name is given, this image
+      ## name is used instead of the default.
+      ## privatized images are needed if sources need to be pulled where access
+      ## credentials (ssh key pairs) are required. Only in privatized build
+      ## containers ssh key pairs and ssh configuration can be injected.
+      ## privatized means: a user 'yocto' exists that has the same uid:gid like
+      ## the invoking user. The users home directory is '/home/yocto'.
+      ## Yocto builds cannot be executed as root.
+      privatized_image: # my-yocto-bitbaker
+
+      ## The docker container requires several volumes to be injected.
+      ## Per volume mapping there is the directory name/volume name on
+      ## the _host_ side and the directory name on the _container_ side.
+      ## The respective names are arranged along those keys.
+
+      ## A project root directory must be injected as volume to the container.
+      ## On the host side the directory is always the project directory (as
+      ## the name suggests. It cannot be configured differently.
+      project_dir: /yocto/root
+
+      ## The cache directory is the optional.
+      ## If not given, all caching is done inside the container and thrown
+      ## away when the container is destroyed.
+      ## The site.conf script should set download cache (DL_DIR) and
+      ## Shared state cache (SSTATE_DIR) to directories below this directory
+      cache_dir:
+        host: $(pwd)/../cache  ## one level up the project directory
+        container: /yocto/cache  ## interacts with side.conf settings
+
+      ## If a publishing dir is given publishing of results (images or packages)
+      ## is possible. This means images or packages are copied/rsynced
+      ## to the respective container path. and would show up on the host path.
+      publish_dir:
+        host: volume or path
+        ## Used as default by this script
+        container: /yocto/publish
 
 Variables
 ---------
@@ -181,13 +203,13 @@ There are two constraints:
 
 Assuming on the shell the SSTATE_DIR environment variable is set:
 
-.. code :: (shell)
+.. code :: console
 
     export SSTATE_DIR=/yocto/foobar
 
 and the content of the Rontofile is:
 
-.. code ::
+.. code :: yaml
 
     # Environment variable defaults
     defaults:

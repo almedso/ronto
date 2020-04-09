@@ -9,7 +9,6 @@
 import os
 import re
 import sys
-from sphinx.ext import apidoc
 # sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -33,8 +32,6 @@ with open(init_file, 'r') as f:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -120,14 +117,3 @@ html_sidebars = {
         'navigation.html',
     ]
 }
-
-
-# -- Custom config to work around readthedocs.org #1139 -------------------
-
-def run_apidoc(_):
-    output_path = os.path.join(repo_root, 'docs', 'source', 'api')
-    apidoc.main(['-o', output_path, '-f', pkg_root])
-
-
-def setup(app):
-    app.connect('builder-inited', run_apidoc)

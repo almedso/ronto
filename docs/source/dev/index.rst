@@ -121,6 +121,21 @@ browser to http://127.0.0.1:8000/.
 
 .. _release-label:
 
+Versioning
+==========
+
+This project is a command line tool.
+Semantic versioning is applied and interpreted as follow:
+
+* major change: New commands, new rontofile version - or just something
+    important
+* minor change: Additional options, additional fields in rontofile
+    no behavior change.
+* patch change: Same behavior, bugfixes applied
+
+Versions with major equal to zero imply an expectation of sematic instability
+in cli and ronto file.
+
 Release Process
 ===============
 
@@ -131,13 +146,12 @@ environment.
 
 - Check that the package version label in ``__init__.py`` is correct.
 
-- Create and push a repo tag to Github. As a convention use the package
-  version number (e.g. YY.MM.MICRO) as the tag.
+- Create and push a repo tag to Github.
 
   .. code-block:: console
 
       $ git checkout master
-      $ git tag YY.MM.MICRO -m "A meaningful release tag comment"
+      $ git tag vMajor.Minor.Patch -m "A meaningful release tag comment"
       $ git tag  # check release tag is in list
       $ git push --tags origin master
 
