@@ -257,7 +257,9 @@ def docker_context():
                 docker.build_privatized_docker_image()
                 docker.create_container()
                 docker.start_container()
-                result = docker.run_command(sys.argv)
+                command = sys.argv
+                command[0] = 'ronto'
+                result = docker.run_command(command)
                 docker.stop_container()
             else:
                 verbose("Do not run on docker")
