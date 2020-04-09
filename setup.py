@@ -56,7 +56,7 @@ if __name__ == '__main__':
         zip_safe=False,
         entry_points={
             "console_scripts": [
-                "ronto = main:main",
+                "ronto = ronto.main:main",
             ]
         },
         classifiers=['Development Status :: 3 - Alpha',

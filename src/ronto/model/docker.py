@@ -110,6 +110,7 @@ def create_dir_and_dockerfile(
     dockerfile = f"""
         FROM {yocto_bitbaker_image}
 
+        RUN pip3 install --upgrade ronto
         RUN groupadd --gid {gid} yocto || true && \
         useradd --uid {uid} --gid {gid} --home {yocto_user_home} \
                 --create-home --shell /bin/bash yocto
