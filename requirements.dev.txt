@@ -5,3 +5,4 @@ mypy
 sphinx
 twine
 wheel
+pytest

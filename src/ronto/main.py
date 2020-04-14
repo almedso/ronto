@@ -42,7 +42,10 @@ def main():
                 help="Increase output verbosity")
         parser.add_argument('-d', '--dryrun',
                 action='store_true',
-                help="print commands only")
+                help="Print commands only")
+        parser.add_argument('-e', '--env',
+                type=str, action='append',
+                help="Inject environment Variable e.g. FOO=bar")
         parser.add_argument('--version', action="version",
                 version=ronto.__version__,
                 help="Print program version")
@@ -55,6 +58,7 @@ def main():
         args = parser.parse_args()
         ronto.set_verbosity(args.verbose)
         ronto.set_dryrun(args.dryrun)
+        ronto.set_variables(args.env)
         read_rontofile(args.file)
         if 'func' in args:
                 args.func(args)

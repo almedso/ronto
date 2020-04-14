@@ -41,13 +41,13 @@ scrub:
 # help: test                           - run tests
 .PHONY: test
 test:
-	@python -m unittest discover -s tests
+	@py.test tests
 
 
 # help: test-verbose                   - run tests [verbosely]
 .PHONY: test-verbose
 test-verbose:
-	@python -m unittest discover -s tests -v
+	@py.test -v tests
 
 
 # help: check-coverage                 - perform test coverage checks
