@@ -20,7 +20,9 @@ def get_model():
 
 def set_variables(variables):
     global cli_variables_
-    cli_variables_ = dict(var.split('=') for var in variables)
+    if variables:
+        verbose(f"CLI environment parameters: {variables}")
+        cli_variables_ = dict(var.split('=') for var in variables)
 
 
 def read_rontofile(file):

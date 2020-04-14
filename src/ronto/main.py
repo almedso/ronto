@@ -58,7 +58,7 @@ def main():
         args = parser.parse_args()
         ronto.set_verbosity(args.verbose)
         ronto.set_dryrun(args.dryrun)
-        ronto.set_variables(args.env)
+        ronto.model.set_variables(args.env)
         read_rontofile(args.file)
         if 'func' in args:
                 args.func(args)
