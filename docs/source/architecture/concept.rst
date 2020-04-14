@@ -70,16 +70,66 @@ Requirements
 Use Cases
 ---------
 
-1. Developer builds locally on his machine a *one specific* package
-   and deploys it to his *private development bare metal* target.
+Developer bootstraps Yocto build environment
+............................................
 
-2. Integrator builds locally on his machine an image for two targets
-   and deploy and tests to to integration targets.
+.. code :: console
 
-3. Continuous Integration Server builds a set of images for a set of
-   machines and publishes some images as well as all packages
+    ronto bootstrap
 
-4. A release engineer pins/releases a certain successful CI build
+Developer has to answer a couple of questions.
+Result is a created project directory plus a *Rontofile.yml*
+inside the project directory.
+
+Developer builds something on his machine
+.........................................
+
+Developer builds locally on his machine a *one specific* package
+and deploys it to his *private development bare metal* target.
+
+.. code :: console
+
+    $ ronto build --fetch --init --interactive
+    (yocto)> bitbake
+
+
+Integrator builds locally
+.........................
+
+Integrator builds locally on his machine an image for two targets
+and deploy and tests to to integration targets.
+
+.. code :: console
+
+    ronto --env TARGETS=mytargets.yml build --fetch --init
+
+
+CI server builds and publishes
+..............................
+
+Continuous Integration Server builds a set of images for a set of
+machines and publishes some images as well as all packages
+
+.. code :: console
+
+    ronto fetch
+    ronto init --cleanconf
+    ronto --env TARGETS=sources/recipe-repo/conf/integration-targets.yml build
+    ronto --env TARGETS=sources/recipe-repo/conf/integration-targets.yml publish
+
+Release Engineer releases
+.........................
+
+A release engineer pins/releases a certain successful CI build.
+afterwards he/she build the pinned release.
+
+    # do some pinning stuff
+    ronto --env MANIFEST=release_xyz.yml fetch
+    ronto init --cleanbuild
+    ronto --env TARGETS=sources/recipe-repo/conf/release-targets.yml build
+    ronto --env TARGETS=sources/recipe-repo/conf/release-targets.yml publish
+
+
 
 Requirements
 ------------
@@ -87,8 +137,19 @@ Requirements
 * This tool shall work with or without docker
 * This tool shall work with and without repo tool.
 
-This tool is just a convenient wrapper:
+This tool is a convenient wrapper:
 Yocto builds with or without this tool shall work the same way.
+
+
+Quality Attributes
+..................
+
+* The project config file is the central play that should operate
+  with references to details that are rather bound to recipes and configuration
+  repositories.
+* CLI and config file shall be self-explaining and intuitive
+* Different pront colors (interactive if on docker/bare metal
+* Different promt color if bitbake environment is active
 
 
 Concept
@@ -101,3 +162,18 @@ Problems to be solved:
 * handling site.conf
 * version pinning of integration releases
 * Consistent CI/Releasing commit messages and tags (established conventions)
+
+Include of sub-rontofiles
+-------------------------
+
+Quality requirement: Maintainability
+
+The build targets specification has to be located in the custom recipes repository.
+Only in that repository are machines and images known.
+Following the "strong coupling principle" the build targets specification must be
+maintained in that repository as well.
+
+.. note ::
+
+   Late loading must be implemented, since it might be possible that this
+   specification is only or updated available after the fetching step
