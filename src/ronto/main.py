@@ -12,7 +12,7 @@ import ronto.cli.build
 import ronto.cli.all
 import ronto.cli.docker
 
-from ronto.model import read_rontofile, VersionError
+from ronto.model import read_rontofile, VersionError, set_variables
 
 
 def format_exception(e):
@@ -63,7 +63,7 @@ def main():
         args = parser.parse_args()
         ronto.set_verbosity(args.verbose)
         ronto.set_dryrun(args.dryrun)
-        ronto.model.set_variables(args.env)
+        set_variables(args.env)
         try:
             read_rontofile(args.file)
         except VersionError:

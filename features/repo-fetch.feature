@@ -1,12 +1,12 @@
 Feature: Repotool fetching
 
+@before.clean
 Scenario: fetch command from scratch only defaults
     Given a rontofile content as
         """
         repo:
           url: git@github.com:almedso/repo-yocto.git
         """
-    Given empty sources
     When I finally enter "--dryrun --verbose fetch"
     Then ronto prints
         """
@@ -26,7 +26,7 @@ Scenario: fetch command from scratch only defaults
         \* Docker decorator - done
         """
 
-
+@before.clean
 Scenario: fetch command from scratch with branch and manifest
     Given a rontofile content as
         """
@@ -38,7 +38,6 @@ Scenario: fetch command from scratch with branch and manifest
           branch: "{{ BRANCH }}"
           manifest: "{{ MANIFEST }}"
         """
-    Given empty sources
     When I finally enter "--dryrun --verbose fetch"
     Then ronto prints
         """
@@ -58,6 +57,7 @@ Scenario: fetch command from scratch with branch and manifest
         \* Docker decorator - done
         """
 
+@before.clean
 Scenario: fetch command from scratch with branch and manifest overwrite
     Given a rontofile content as
         """
@@ -69,7 +69,6 @@ Scenario: fetch command from scratch with branch and manifest overwrite
           branch: "{{ BRANCH }}"
           manifest: "{{ MANIFEST }}"
         """
-    Given empty sources
     When I finally enter "--dryrun --verbose --env BRANCH=foo --env MANIFEST=bar.xml fetch"
     Then ronto prints
         """
@@ -90,13 +89,13 @@ Scenario: fetch command from scratch with branch and manifest overwrite
         \* Docker decorator - done
         """
 
+@before.clean
 Scenario: fetch command with enforced update
     Given a rontofile content as
         """
         repo:
           url: git@github.com:almedso/repo-yocto.git
         """
-    Given empty sources
     When I finally enter "--dryrun --verbose fetch --force"
     Then ronto prints
         """

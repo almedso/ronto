@@ -125,7 +125,6 @@ def get_value(descriptor: List[str], model=None):
         return None
     if descriptor[0] in model:
         m = model[descriptor[0]]
-
         if len(descriptor) > 1:
             # recursive call
             return get_value(descriptor[1:], m)
@@ -149,6 +148,6 @@ def get_value_with_default(descriptor: List[str], default=None , model=None):
         # at docker closures/decorators
         print(f"Variable {err.message} not defined but needed by ronto.yml")
         sys.exit(1)
-    if value:
+    if value != None:  # ask explicitely since e.g. False must be return as boolean value
         return value
     return default

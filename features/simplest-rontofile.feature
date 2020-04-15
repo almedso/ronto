@@ -1,11 +1,11 @@
 Feature: Simplest Rontofile
 
+@before.clean
 Scenario: fetch command empty sources
     Given a rontofile content as
         """
         git:
         """
-    Given empty sources
     When I finally enter "--dryrun fetch"
     Then ronto prints
         """

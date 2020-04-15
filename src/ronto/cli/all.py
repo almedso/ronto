@@ -9,9 +9,15 @@ from .build import process as build_process
 
 
 def process(args):
-    fetch_process()
-    init_process()
-    build_process()
+    args.force = None
+    fetch_process(args)
+    args.rebuild_conf = False
+    args.clean_build = False
+    args.overwrite_site = False
+    init_process(args)
+    args.interactive = False
+    args.targets = ""
+    build_process(args)
 
 
 def add_command(subparser):

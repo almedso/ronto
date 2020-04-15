@@ -1,11 +1,11 @@
 Feature: Git fetching
 
+@before.clean
 Scenario: fetch command from scratch only defaults
     Given a rontofile content as
         """
         git:
         """
-    Given empty sources
     When I finally enter "--dryrun --verbose fetch"
     Then ronto prints
         """
@@ -22,7 +22,7 @@ Scenario: fetch command from scratch only defaults
         \* Docker decorator - done
         """
 
-
+@before.clean
 Scenario: fetch command from scratch two repos
     Given a rontofile content as
         """
@@ -32,7 +32,6 @@ Scenario: fetch command from scratch two repos
           - git_url: git@github.com:almedso/repo-yocto.git
             source_dir: sources/ams
         """
-    Given empty sources
     When I finally enter "--dryrun --verbose fetch"
     Then ronto prints
         """
@@ -55,6 +54,7 @@ Scenario: fetch command from scratch two repos
         """
 
 @slow
+@before.clean
 Scenario: fetch command with update
     Given a rontofile content as
         """
@@ -62,7 +62,6 @@ Scenario: fetch command with update
           - git_url: git@github.com:almedso/repo-yocto.git
             source_dir: sources/ams
         """
-    Given empty sources
     When I enter "fetch"
     Then "sources/ams" contains a git repository
     When I finally enter "--dryrun --verbose fetch"
@@ -82,6 +81,7 @@ Scenario: fetch command with update
         \* Docker decorator - done
         """
 
+@before.clean
 Scenario: fetch command with enforced update
     Given a rontofile content as
         """
@@ -89,7 +89,6 @@ Scenario: fetch command with enforced update
           - git_url: git@github.com:almedso/repo-yocto.git
             source_dir: sources/ams
         """
-    Given empty sources
     When I enter "fetch"
     Then "sources/ams" contains a git repository
     When I finally enter "--dryrun --verbose fetch --force"
@@ -106,6 +105,6 @@ Scenario: fetch command with enforced update
         \* Remove old sources - i.e. forced update
         \* Clone git repo: git@github.com:almedso/repo-yocto.git
         dry working dir: .*/sources
-        dry: git clone git@github.com:almedso/repo-yocto.git /home/volker/repos/yocto/ronto/sources/ams
+        dry: git clone git@github.com:almedso/repo-yocto.git .*sources/ams
         \* Docker decorator - done
         """

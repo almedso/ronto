@@ -19,10 +19,12 @@ import array
 import tty
 import pty
 import subprocess
+import yaml
 
 
 from ronto import verbose, dryrun
 from .init import get_init_build_dir, get_init_script
+from ronto.model import get_value, get_value_with_default
 
 
 class InteractiveContext:
@@ -103,7 +105,7 @@ class BatchContext:
 
 
 class Builder:
-    def __init__(self, model):
+    def __init__(self):
         script = get_init_script()
         self.build_dir = get_init_build_dir()
 
@@ -112,20 +114,34 @@ class Builder:
         source_line = "source " + script + " " + self.build_dir
         verbose(f"Builder init sourcing: {source_line}")
         self.source_line = source_line
-        super().__init__()
 
 
-def get_targets(model):
+def get_targets_from_yaml_file(targets_file):
+    """
+    Read targets from file (either input or defined in ronto.yml )
+    @target_file: relative path of targets file from project directory
+                  or None
+    @returns None of structure of the file
+    """
+    if not targets_file:
+        targets_file = get_value_with_default(['build', 'targets_file'])
+    if targets_file:
+        verbose(f"Read targets from file: {targets_file}")
+        try:
+            with open(targets_file) as file:
+                return yaml.load(file, Loader=yaml.FullLoader)
+        except FileNotFoundError:
+            print(f"File with target specifications not found -> fall back",
+                    file=sys.stderr)
+            return None
+    return None
+
+
+def verify_target_specification(raw_targets):
+    verbose("Verify target specifications")
     targets = []
-    verbose("Check for defined targets")
-    if (
-        "build" in model
-        and isinstance(model["build"], dict)
-        and "targets" in model["build"]
-        and isinstance(model["build"]["targets"], list)
-    ):
-        for target in model["build"]["targets"]:
-            verbose(f"  Found target: {target}")
+    if (raw_targets and isinstance(raw_targets, list)):
+        for target in raw_targets:
             if (
                 isinstance(target, dict)
                 and "machine" in target
@@ -134,30 +150,31 @@ def get_targets(model):
                 and isinstance(target["image"], str)
             ):
                 targets.append(target)
+    return targets
+
+
+def get_targets(targets_file):
+    """ Get list of targets plus inspection of them """
+    raw_targets = get_targets_from_yaml_file(targets_file)
+    if not raw_targets:
+        verbose("Check for targets directly defined in 'ronto.yml'")
+        raw_targets = get_value(["build", "targets"])
+    targets = verify_target_specification(raw_targets)
     if len(targets) == 0:
-        verbose("  No target found -> use default target")
+        verbose("  No verified target found -> use default target")
         # Add a default machine/image combination as of yocto docu
         # getting started section.
         targets.append({"machine": "qemux86", "image": "core-image-sato"})
     return targets
 
 
-def get_packageindex(model):
-    if (
-        "build" in model
-        and isinstance(model["build"], dict)
-        and "packageindex" in model["build"]
-    ):
-        return True if model["build"]["packageindex"] else False
-    return True  # The default is to create package index
-
-
 class TargetBuilder(Builder):
-    def __init__(self, model, _target):
+    def __init__(self, targets_file=None):
         verbose(f"Target Builder")
-        super().__init__(model)
-        self.targets = get_targets(model)
-        self.do_packageindex = get_packageindex(model)
+        super().__init__()
+        self.targets = get_targets(targets_file)
+        self.do_packageindex = get_value_with_default(
+            ["build", "packageindex"], True)
         self.context = BatchContext(self.source_line)
 
     def build(self):
@@ -173,9 +190,9 @@ class TargetBuilder(Builder):
 
 
 class InteractiveBuilder(Builder):
-    def __init__(self, model):
+    def __init__(self):
         verbose(f"Interactive Builder")
-        super().__init__(model)
+        super().__init__()
         self.context = InteractiveContext(self.source_line)
 
     def build(self):

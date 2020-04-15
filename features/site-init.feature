@@ -46,7 +46,7 @@ Scenario: site.conf is injected
         \* Process init command
         \* Run init: source sources/poky/oe-init-build-env build
         \* Use site configuration file: site.conf
-        \* Create site.conf from: /home/volker/repos/yocto/ronto/site.conf
+        \* Create site.conf from: .*site.conf
         \* Docker decorator - done
         """
 
@@ -70,7 +70,7 @@ Scenario: site.conf is injected from other file
         \* Process init command
         \* Run init: source sources/poky/oe-init-build-env build
         \* Use site configuration file: sources/site-conf
-        \* Create site.conf from: /home/volker/repos/yocto/ronto/sources/site-conf
+        \* Create site.conf from: .*sources/site-conf
         \* Docker decorator - done
         """
     Then "build/conf/site.conf" does exist

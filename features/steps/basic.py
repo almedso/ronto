@@ -10,7 +10,6 @@ import parse
 use_step_matcher("cfparse")
 
 
-
 @parse.with_pattern(r"finally\s+")
 def parse_word_finally(text):
     """Type converter for "finally " (followed by one/more spaces)."""
@@ -83,9 +82,3 @@ def step_impl(context):
     for i in range(len(expected)):
         print(f"Index: {i}, {expected[i]}")
         assert match_line(expected[i], context.output[i])
-
-
-@given(u'empty sources')
-def step_impl(context):
-    if os.path.isdir('sources'):
-        shutil.rmtree('sources')
