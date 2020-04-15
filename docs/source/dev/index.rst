@@ -18,6 +18,12 @@ not broken existing functionality. The ronto
 project provides some convenience tools so this testing step can be quickly
 performed.
 
+Developer **unit tests** are supported with *py.test* as well
+as **component tests** are supported with *behave*.
+
+The **unit tests** are specified in the *tests* folder.
+The **component tests** are specified in the *features* folder.
+
 Use the Makefile convenience rules to run the tests.
 
 .. code-block:: console
@@ -30,7 +36,7 @@ To run tests verbosely use:
 
     (venv) $ make test-verbose
 
-Alternatively, you may want to run the tests suite directly. The following
+Alternatively, you may want to run the tests suites directly. The following
 steps assume you are running in a virtual environment in which the
 ``ronto`` package has been installed. If this is
 not the case then you will likely need to set the ``PYTHONPATH`` environment
@@ -38,28 +44,8 @@ variable so that the ``ronto`` package can be found.
 
 .. code-block:: console
 
-    (venv) $ cd tests
-    (venv) $ python -m unittest
-
-Individual unit tests can be run also.
-
-.. code-block:: console
-
-    (venv) $ python -m test_basic
-
-
-.. _test-coverage-label:
-
-Coverage
-========
-
-The ``coverage`` tool can be run to collect code test coverage metrics.
-
-Use the Makefile convenience rule to run the tests.
-
-.. code-block:: console
-
-    (venv) $ make check-coverage
+    (venv) $ py.test  # unit tests
+    (venv) $ behave  # component tests
 
 
 .. _style-compliance-label:

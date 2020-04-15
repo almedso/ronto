@@ -41,23 +41,20 @@ scrub:
 # help: test                           - run tests
 .PHONY: test
 test:
+	@# run unit tests
 	@py.test tests
+	@# run component tests
+	@behave
 
 
 # help: test-verbose                   - run tests [verbosely]
 .PHONY: test-verbose
 test-verbose:
+	@# run unit tests verbosely
 	@py.test -v tests
+	@# run component tests verbosely
+	@behave -v
 
-
-# help: check-coverage                 - perform test coverage checks
-.PHONY: check-coverage
-check-coverage:
-	@coverage run -m unittest discover -s tests
-	@# produce html coverage report on modules
-	@coverage html -d docs/source/coverage --include="src/ronto/*"
-	@# rename coverage html file for latter use with documentation
-	@cd docs/source/coverage; mv index.html coverage.html
 
 
 # help: style                          - perform code format compliance check
@@ -74,8 +71,8 @@ check-types:
 
 
 # help: docs                           - generate project documentation
-.PHONY: check-coverage
-docs: check-coverage
+.PHONY: docs
+docs:
 	@cd docs; make html
 
 
