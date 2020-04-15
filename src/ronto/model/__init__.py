@@ -1,4 +1,5 @@
 import os
+import sys
 import yaml
 import re
 from typing import List
@@ -67,7 +68,7 @@ def _potentially_replace_by_var(data):
         if value:
             data = data.replace(replacement, value)
         else:
-            raise VarNotKnownError(m.group(1))
+            raise VarNotKnownError(m.group(2))
     return data
 
 
@@ -115,11 +116,13 @@ def get_value(descriptor: List[str], model=None):
             return _potentially_replace_by_var(m)
     return None
 
-def get_value_with_default(descriptor: List[str], default: str = None , model=None) -> str:
+def get_value_with_default(descriptor: List[str], default=None , model=None):
     try:
         value = get_value(descriptor, model)
     except VarNotKnownError as err:
-        print(f"Variable {err.variable} not defined but needed by ronto.yml")
+        # not sure if that is a good idea and should be rather done
+        # at docker closures/decorators
+        print(f"Variable {err.message} not defined but needed by ronto.yml")
         sys.exit(1)
     if value:
         return value

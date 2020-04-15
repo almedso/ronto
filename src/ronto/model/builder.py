@@ -22,7 +22,7 @@ import subprocess
 
 
 from ronto import verbose, dryrun
-from .init import get_init_build_dir, get_init_script, get_init_template_dir
+from .init import get_init_build_dir, get_init_script
 
 
 class InteractiveContext:
@@ -104,15 +104,12 @@ class BatchContext:
 
 class Builder:
     def __init__(self, model):
-        script = get_init_script(model)
-        template_dir = get_init_template_dir(model)
-        self.build_dir = get_init_build_dir(model)
+        script = get_init_script()
+        self.build_dir = get_init_build_dir()
 
-        source_line = ""
-        if template_dir != None:
-            source_line += "TEMPLATECONF="
-            source_line += os.path.join(os.getcwd(), template_dir) + " "
-        source_line += "source " + script + " " + self.build_dir
+        # There is no need to source something with templatedir
+        # this is done potentially in init command
+        source_line = "source " + script + " " + self.build_dir
         verbose(f"Builder init sourcing: {source_line}")
         self.source_line = source_line
         super().__init__()

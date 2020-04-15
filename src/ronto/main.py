@@ -34,7 +34,8 @@ def main():
     try:
         parser = argparse.ArgumentParser(
                 prog='ronto',
-                description="Yocto build wrapper")
+                description="Yocto build wrapper " \
+                        "(full documentation at: https://ronto.readthedocs.io)")
         parser.add_argument('-f', '--file',
                 help="Use alternative Rontofile",
                 default='ronto.yml',

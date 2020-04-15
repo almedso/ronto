@@ -54,7 +54,7 @@ Scenario: fetch command from scratch two repos
         \* Docker decorator - done
         """
 
-
+@slow
 Scenario: fetch command with update
     Given a rontofile content as
         """

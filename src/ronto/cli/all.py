@@ -4,7 +4,7 @@ import os
 
 from ronto import verbose
 from .fetch import process as fetch_process
-from .init import process as init_process
+from .init import init_process
 from .build import process as build_process
 
 

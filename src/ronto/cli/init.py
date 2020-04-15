@@ -2,57 +2,67 @@ import subprocess
 import sys
 import os
 
+from .fetch import process as fetch_process
+
 from ronto import verbose
 from ronto.model import get_model
-from ronto.model.fetcher import GitFetcher, RepoFetcher
 from ronto.model.init import SiteConfigHandler, run_init, clean_init
 from ronto.model.docker import docker_context
 
 
 @docker_context()
-def process(args):
+def init_process(args):
     verbose("Process init command")
-    git_fetcher = GitFetcher(get_model())
-    git_fetcher.fetch()
-    repo_fetcher = RepoFetcher(get_model())
-    repo_fetcher.fetch()
-    clean_init(
-        get_model(), rebuild_conf=args.rebuild_conf, clean_build_dir=args.clean_build
-    )
-    run_init(get_model())
-    siteconf = SiteConfigHandler(get_model())
-    siteconf.handle(args.overwrite_site)
+    clean_init(rebuild_conf=args.rebuild_conf,
+            clean_conf_dir=args.clean_conf,
+            clean_build_dir=args.clean_build)
+    run_init()
+    siteconf = SiteConfigHandler()
+    siteconf.handle()
+
+
+def process(args):
+    if args.fetch:
+        args.force = False
+        fetch_process(args)
+    init_process(args)
 
 
 def add_command(subparser):
-    parser_pin = subparser.add_parser(
+    parser = subparser.add_parser(
         "init",
         help="""
             Initialize a build environment such that bitbake can run afterwards.
+            As a result, <build-dir> exists, local.conf, bblayer.conf and
+            optionally site.conf are in the <build-dir>/conf directory.
 
-            This includes:
-            (optionally creating and starting the build container),
-            (optionally initializing google repo, syncing all sources),
-            Creating environment variables,
-            "test"-calling the yoctoinit script
+            There are various options, to either reuse existing
+            all controlled by ronto.yml.
+            "test"-sourcing the yocto init script
             """,
     )
-    parser_pin.add_argument(
-        "-s",
-        "--overwrite-site",
-        help="Overwrite site.conf, only if it exist",
+    parser.add_argument(
+        "-f",
+        "--fetch",
+        help="Run fetch command before init",
         action="store_true",
     )
-    parser_pin.add_argument(
+    parser.add_argument(
         "-l",
         "--rebuild-conf",
-        help="Rebuild local.conf and bblayers.conf",
+        help="Rebuild local.conf and bblayers.conf at init",
         action="store_true",
     )
-    parser_pin.add_argument(
+    parser.add_argument(
+        "-c",
+        "--clean-conf",
+        help="Remove conf directory before init",
+        action="store_true",
+    )
+    parser.add_argument(
         "-b",
         "--clean-build",
-        help="Remove build directory directory",
+        help="Remove build directory directory before init",
         action="store_true",
     )
-    parser_pin.set_defaults(func=process)
+    parser.set_defaults(func=process)
