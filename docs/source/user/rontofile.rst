@@ -192,7 +192,17 @@ container startup and volume injection and build execution transparently.
 Variables
 ---------
 
-Definitions can be overwritten by environment variables.
+Definitions can be overwritten by shell environment variables or
+variables injected on the command line via *-e* or *--env*
+global option.
+
+* Injection via command line parameter overwrites injection via
+  environment variables.
+* Injection via command line comes along with site effects but shows
+  up in shell history
+* Injection via shell environment variables might be important
+  if secrets need to be passed on.
+
 There are two constraints:
 
 * Each used environment variable must be listed in the default
@@ -222,3 +232,12 @@ and the content of the *ronto.yml* is:
 *download* will be set to */yocto/foo* (the default) and
 *shared_state* will be set to */yocto/foobar* (obtained from the process
 environment.
+
+Alternatively the SSTATE_DIR can be set on the command line like
+
+.. code :: yaml
+
+    SSTATE_DIR=/yocto/foobar ronto --env SSTATE_DIR=/yocto/foo init
+
+The result would be that *shared_state* will be set to */yocto/foo*
+(obtained from command line parameter (because of it's higher priority)).
