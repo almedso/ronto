@@ -36,13 +36,13 @@ ronto is available on PyPI and can be installed with `pip <https://pip.pypa.io>`
 
 After installing ronto the ronto command is available to you.
 
-The build specification is maintained in a Rontofile.
+The build specification is maintained in a *ronto.yml*.
 
 Start and explore with
 
 .. code-block:: python
 
-    # bootstrap a new build Rontofile
+    # bootstrap a new build ronto.yml
     ronto bootstrap
 
     # fine grained step by step build

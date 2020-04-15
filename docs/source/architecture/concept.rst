@@ -78,7 +78,7 @@ Developer bootstraps Yocto build environment
     ronto bootstrap
 
 Developer has to answer a couple of questions.
-Result is a created project directory plus a *Rontofile.yml*
+Result is a created project directory plus a *ronto.yml*
 inside the project directory.
 
 Developer builds something on his machine

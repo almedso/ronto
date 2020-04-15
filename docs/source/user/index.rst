@@ -40,9 +40,9 @@ Be aware that there are global options like *--verbose* or
 whereby the sub-commands can have sub-command specific options.
 
 The **ronto** command is expected to be called in the yocto project
-root directory. It operates based on configuration in a **Rontofile.yml**.
-That **Rontofile.yml** is supposed to be located in the very same directory.
-An alternative **Rontofile.yml** can be given by *-f* or *--file*
+root directory. It operates based on configuration in a **ronto.yml**.
+That **ronto.yml** is supposed to be located in the very same directory.
+An alternative **ronto.yml** can be given by *-f* or *--file*
 global option.
 
 .. include:: rontofile.rst

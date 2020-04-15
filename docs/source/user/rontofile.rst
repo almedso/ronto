@@ -1,8 +1,8 @@
 Rontofile Reference
 ===================
 
-The Rontofile is the home of ronto settings.
-This name *Rontofile* plus the location in the root directory
+The ronto file named *ronto.yml* is the home of ronto settings.
+This name *ronto.yml* plus the location in the root directory
 of the (Yocto) project is established as convention.
 It enforces two things:
 
@@ -15,7 +15,7 @@ It enforces two things:
 Rontofile content
 -----------------
 
-The following full blown Rontofile including documentation shows the
+The following full blown *ronto.yml* including documentation shows the
 maximum capabilities and explains the meaning of those single values.
 
 Yaml format is used to arrange and express the settings.
@@ -24,7 +24,7 @@ and `Yaml home <https://yaml.org/spec/1.2/spec.html>`_ for formal specification.
 
 If an obvious content line is commented out, this means the given value
 is taken as a default. There is no need to have this setting part of
-the Rontofile, it will assemble a compact presentation.
+the *ronto.yml*, it will assemble a compact presentation.
 
 Build Source Specification
 ..........................
@@ -207,7 +207,7 @@ Assuming on the shell the SSTATE_DIR environment variable is set:
 
     export SSTATE_DIR=/yocto/foobar
 
-and the content of the Rontofile is:
+and the content of the *ronto.yml* is:
 
 .. code :: yaml
 

@@ -127,9 +127,9 @@ Versioning
 This project is a command line tool.
 Semantic versioning is applied and interpreted as follow:
 
-* major change: New commands, new rontofile version - or just something
+* major change: New commands, new ronto.yml version - or just something
     important
-* minor change: Additional options, additional fields in rontofile
+* minor change: Additional options, additional fields in ronto.yml
     no behavior change.
 * patch change: Same behavior, bug-fixes applied
 

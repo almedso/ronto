@@ -34,7 +34,7 @@ ronto is available on PyPI and can be installed with `pip <https://pip.pypa.io>`
 
 After installing ronto the ronto command is available to you.
 
-The build specification is maintained in a *Rontofile.yml*.
+The build specification is maintained in a *ronto.yml* file.
 
 Start and explore with
 
@@ -44,10 +44,11 @@ Start and explore with
     ronto bootstrap
 
     # fine grained step by step build
+    ronto fetch
     ronto init
     ronto build
     ronto publish
 
-    # or more compact round-trip
+    # or more compact round-trip (like make all)
     ronto all
 
