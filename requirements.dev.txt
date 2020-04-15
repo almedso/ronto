@@ -3,6 +3,7 @@ black
 coverage
 mypy
 sphinx
+sphinx_rtd_theme
 twine
 wheel
 pytest

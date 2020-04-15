@@ -32,6 +32,7 @@ with open(init_file, 'r') as f:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_rtd_theme',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -95,18 +96,21 @@ suppress_warnings = ['image.nonlocal_uri']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+# html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
 html_theme_options = {
-    'description': ' Wrapper around building stuff using repotool and Yocto',
-    'show_powered_by': False,
-    # 'logo': 'my-logo.png',
-    'logo_name': False,
-    'page_width': '80%',
+    #alabaster 'description': ' Wrapper around building stuff using repotool and Yocto',
+    #alabaster 'show_powered_by': False,
+    #alabaster 'logo': 'my-logo.png',
+    #alabaster 'logo_name': False,
+    #alabaster 'page_width': '80%',
+    'display_version': True,
+    'navigation_depth': 2,
 }
 
 # Custom sidebar templates, maps document names to template names.

@@ -22,15 +22,18 @@ Usage
 The usage is very simple. There is just the command **ronto**
 with sub-commands for the different specific tasks.
 
-The **ronto** command reveals what it is capable by running:
+The **ronto** command reveals what it is capable of and specifically
+what sub-commands exist by running:
 
-.. code-block ::  bash
+.. code-block ::  console
 
-    $ ronto --help
+    $ ronto
+
+without any parameter.
 
 or if you need help to one of the sub command call:
 
-.. code-block ::  bash
+.. code-block ::  console
 
     $ ronto <subcommand> --help
 
