@@ -1,15 +1,14 @@
 Feature: Simplest Rontofile
 
-Scenario: fetch command
+Scenario: fetch command empty sources
     Given a rontofile content as
         """
         git:
         """
-    When I enter "--dryrun init"
+    Given empty sources
+    When I finally enter "--dryrun fetch"
     Then ronto prints
         """
-        dry working dir:.*sources/poky
-        dry: git remote update
-        dry working dir:
-        dry: bash -c source sources/poky/oe-init-build-env build
+        dry working dir:.*sources
+        dry: git clone
         """

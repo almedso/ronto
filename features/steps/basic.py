@@ -1,8 +1,22 @@
 import subprocess
 import os
+import shutil
 import re
 import tempfile
 from behave import *
+import parse
+
+
+use_step_matcher("cfparse")
+
+
+
+@parse.with_pattern(r"finally\s+")
+def parse_word_finally(text):
+    """Type converter for "finally " (followed by one/more spaces)."""
+    return text.strip()
+
+register_type(finally_=parse_word_finally)
 
 
 COMMAND = ['python', '-m', 'ronto.main' ]
@@ -21,16 +35,17 @@ def step_impl(context):
     assert 0 == result.returncode
 
 
-@when('I enter "{cli}"')
-def step_impl(context, cli):
+@when('I {:finally_?}enter "{cli}"')
+def step_impl(context, finally_, cli):
     rontofile = []
     if hasattr(context, 'rontofile'):
         rontofile = ['--file', context.rontofile ]
     command = COMMAND + rontofile + cli.split()
+    context.command = command
     output = subprocess.check_output(command)
     context.output = output.decode().split('\n')
-    if hasattr(context, 'rontofile'):
-        # cleanup after command was running
+    if hasattr(context, 'rontofile') and finally_:
+        # cleanup temporary rontofile after command was running "finally"
         os.remove(context.rontofile)
 
 
@@ -49,6 +64,8 @@ def step_impl(context):
 
 @then(u'ronto prints')
 def step_impl(context):
+    if hasattr(context, 'command'):
+        print(f"Command run: {context.command}")
     expected = context.text.split('\n')
     print(f"expected: {expected}")
     assert hasattr(context, 'output')
@@ -57,3 +74,9 @@ def step_impl(context):
     for i in range(len(expected)):
         print(f"Index: {i}, {expected[i]}")
         assert match_line(expected[i], context.output[i])
+
+
+@given(u'empty sources')
+def step_impl(context):
+    if os.path.isdir('sources'):
+        shutil.rmtree('sources')

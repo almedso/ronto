@@ -6,9 +6,11 @@ import os
 import traceback
 
 import ronto
+import ronto.cli.fetch
 import ronto.cli.init
-import ronto.cli.docker
 import ronto.cli.build
+import ronto.cli.all
+import ronto.cli.docker
 
 from ronto.model import read_rontofile
 
@@ -35,7 +37,7 @@ def main():
                 description="Yocto build wrapper")
         parser.add_argument('-f', '--file',
                 help="Use alternative Rontofile",
-                default='Rontofile.yml',
+                default='ronto.yml',
                 type=argparse.FileType())
         parser.add_argument('-v', '--verbose',
                 action='store_true',
@@ -51,9 +53,11 @@ def main():
                 help="Print program version")
         subparsers = parser.add_subparsers(help='sub-command help')
 
+        ronto.cli.fetch.add_command(subparsers)
         ronto.cli.init.add_command(subparsers)
-        ronto.cli.docker.add_command(subparsers)
         ronto.cli.build.add_command(subparsers)
+        ronto.cli.all.add_command(subparsers)
+        ronto.cli.docker.add_command(subparsers)
 
         args = parser.parse_args()
         ronto.set_verbosity(args.verbose)

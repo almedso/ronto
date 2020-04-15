@@ -27,7 +27,7 @@ def set_variables(variables):
 
 def read_rontofile(file):
     global model_
-    verbose("Read Rontofile.yml")
+    verbose("Read ronto.yml")
     model_ = yaml.load(file, Loader=yaml.FullLoader)
     update_defaults()
 
@@ -38,7 +38,6 @@ def env_val(key, value):
         verbose(f"Read from environment {key}: {env}")
         return env
     else:
-        verbose(f"Use default for {key}: {value}")
         return value
 
 
@@ -48,6 +47,14 @@ def _get_variable(key):
     if key in variables_:
         return variables_[key]
     return None
+
+
+class VarNotKnownError(Exception):
+    def __init__(self, *args):
+        if args:
+            self.message = args[0]
+        else:
+            self.message = 'unknown'
 
 
 def _potentially_replace_by_var(data):
@@ -60,7 +67,7 @@ def _potentially_replace_by_var(data):
         if value:
             data = data.replace(replacement, value)
         else:
-            raise Exception(f"Missing value for variable {m.group(1)}")
+            raise VarNotKnownError(m.group(1))
     return data
 
 
@@ -79,7 +86,7 @@ def update_defaults():
             variables_[default] = env_val(default, model_["defaults"][default])
 
 
-def get_value(descriptor: List[str], model=model_):
+def get_value(descriptor: List[str], model=None):
     """
     Get a value from the model specification (as read from Rontofile)
 
@@ -87,6 +94,8 @@ def get_value(descriptor: List[str], model=model_):
     * injecting the model allows to parse sub areas obtained
     * from returned lists
     """
+    if model == None:
+        model = model_
     if len(descriptor) == 0:
         return None
     if not model or not isinstance(model, dict):
@@ -105,3 +114,13 @@ def get_value(descriptor: List[str], model=model_):
         if isinstance(m, str):
             return _potentially_replace_by_var(m)
     return None
+
+def get_value_with_default(descriptor: List[str], default: str = None , model=None) -> str:
+    try:
+        value = get_value(descriptor, model)
+    except VarNotKnownError as err:
+        print(f"Variable {err.variable} not defined but needed by ronto.yml")
+        sys.exit(1)
+    if value:
+        return value
+    return default
