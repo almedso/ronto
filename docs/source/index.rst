@@ -45,12 +45,16 @@ Start and explore with
 .. code-block:: python
 
     # bootstrap a new build ronto.yml
+    # -- not implemented yet --
     ronto bootstrap
 
     # fine grained step by step build
+    ronto fetch
     ronto init
     ronto build
+    # -- not implemented yet --
     ronto publish
 
-    # or more compact round-trip
-    ronto all
+    # or a custom command
+    # -- not implemented yet --
+    ronto run all

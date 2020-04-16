@@ -87,21 +87,10 @@ as well as what kind of clean is applied before building.
       ## used. Most likely it is not subject to change.
       build_dir: build
 
-      ## site.conf is used to establish site specific settings
-      ## There are different strategies to deal with
-      ## If not given site.conf is ignored.
-      site:
-        ## Default behavior is conservative. if a site.conf file exists in
-        ## build/conf directory it is left untouched.
-        ## if it is not available it is created by file/generated settings
-        ## if overwrite is given site.conf is always overwritten
-        ## in build/conf directory
-        overwrite: false
-
-        ## Use a file to establish build/conf/site.conf
-        ## if nothing else is given file is the default strategy to establish
-        ## site.conf
-        file: site.conf  ## path is relative to project root directory
+      ## <build_dir>/conf/site.conf is used to establish site specific settings
+      ## Use an alternative file to establish <build_dir>/conf/site.conf
+      ## Default is site.conf in project root directory
+      site_conf_file: site.conf ## path is relative to project root directory
 
 Build Targets
 .............
@@ -111,13 +100,37 @@ are defined. This is where they belong to.
 
 .. code :: yaml
 
+  ## Part of the build section
+  build:
+    ## Build targets are best defined by referencing a remote yaml formatted
+    ## file containing a list of target specification.
+    ## The file should be in the repository where respective machines/ images
+    ## are defined and therefore are known.
+    targets_file: sources/my-repo/conf/build-targets.yml
+
+    ## If the targets_file item is not given, alternatively the targets are
+    ## given by the targets items directly. The sub-element is a list of
+    ## targets. If not given the yocto/poky getting started default is
+    ## assumed.
     targets:
-      - image: ams-image
-        machine: roderigo
-        publish: yes
-      - image: ams-image
-        machine: roderigo
-        publish: yes
+      - image: core-image-sato  ## yocto default
+        machine: qemux86  ## of getting started
+
+
+The *targets_file* yaml format is a list of dictionaries that must
+have *machine* and *image* keys. Other keys are possible like
+publish that indicates that further processing, like publishing
+the build artifact.
+
+.. code :: yaml
+
+    - image: ams-image
+      machine: roderigo
+      publish: yes
+    - image: ams-image
+      machine: roderigo
+      publish: no
+
 
 
 Publishing
@@ -202,6 +215,8 @@ global option.
   up in shell history
 * Injection via shell environment variables might be important
   if secrets need to be passed on.
+* Injection via shell environment might be complicated when used
+  in a docker environment
 
 There are two constraints:
 
@@ -210,6 +225,12 @@ There are two constraints:
 * A default value must be given for every environment variable.
   In case a certain environment variable is not set, this default
   is used.
+
+Variables without a default that are not provided
+cause an processing error at runtime when they are evaluated.
+Variables are evaluated at the moment they are needed (late evaluation).
+
+It is possible to have up to two variable evaluation per yml element.
 
 Assuming on the shell the SSTATE_DIR environment variable is set:
 
@@ -223,10 +244,11 @@ and the content of the *ronto.yml* is:
 
     # Environment variable defaults
     defaults:
-      DL_DIR: "/yocto/foo"
+      DL_DIR: "/foo"
+      YOCTO_BASE: "/yocto"
       SSTATE_DIR: "/yocto/bar"
     build:
-      download: "{{ DL_DIR }}"
+      download: "{{ YOCTO_BASE }}{{ DL_DIR }}"
       shared_state: "{{ SSTATE_DIR }}"
 
 *download* will be set to */yocto/foo* (the default) and
