@@ -58,7 +58,7 @@ class VarNotKnownError(Exception):
             self.message = 'unknown'
 
 
-def _potentially_replace_by_var(data):
+def _potentially_replace_by_var_single(data):
     """ This function throws an exception if var not found """
     p = re.compile(r'.*(\{\{ *([A-Za-z]+) *\}\})')
     m = p.match(data)
@@ -71,6 +71,12 @@ def _potentially_replace_by_var(data):
             raise VarNotKnownError(m.group(2))
     return data
 
+
+def _potentially_replace_by_var(data):
+    # we need to support two replacements
+    # so just call the single replacement twice
+    return _potentially_replace_by_var_single(
+            _potentially_replace_by_var_single(data))
 
 def update_defaults():
     """

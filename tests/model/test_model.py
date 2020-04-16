@@ -33,6 +33,16 @@ def test_potentially_replace_by_var__missing_var():
         _potentially_replace_by_var('{{BAR}}')
 
 
+def test_potentially_replace_by_two_vars__successful_match():
+    ronto.model.cli_variables_ = {
+        'FOO': 'foo',
+        'BAR': 'bar'
+    }
+    assert 'foobar' == _potentially_replace_by_var('{{FOO}}{{BAR}}')
+    assert 'foobar' == _potentially_replace_by_var('{{ FOO }}{{ BAR }}')
+    assert ' foo x bar ' == _potentially_replace_by_var(' {{ FOO }} x {{ BAR }} ')
+
+
 def test_get_value__ok():
     model = {
         'foo': {'bar': 'foobar', 'foo': '{{FOO}}'},
