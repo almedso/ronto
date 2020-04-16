@@ -6,12 +6,13 @@ Change Log
 Version History
 ---------------
 1.0.0
-    * Fetch and all sub-commands
+    * Fetch sub-commands
     * Documentation update
     * Read variables from command line
     * Component tests (bdd) introduced
     * Unittest replaced by py.test
     * Coverage removed
+    * Rontofile version strict reading
 
 0.1.2
     * Move to pipy registry

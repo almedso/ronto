@@ -26,6 +26,28 @@ If an obvious content line is commented out, this means the given value
 is taken as a default. There is no need to have this setting part of
 the *ronto.yml*, it will assemble a compact presentation.
 
+Rontofile protocol version
+..........................
+
+Since the *ronto.yml* is subject to modification a strict mode reading
+is supported if a version tag is set. The version is an unsigned integer.
+
+.. code :: yaml
+
+   ## providing a version forces ronto to check against the list of
+   ## supported versions. If no version is given, ronto just tries
+   ## its best.
+   version: 1
+
+In case version a version is set processing is stopped if
+
+* either the version cannot be converted to an unsigned integer
+* or the version is higher than the currently supported version.
+
+This documentation references to *ronto.yml* protocol *version 1*.
+This related **ronto** applications supports to *ronto.yml*
+protocol *version 1*.
+
 Build Source Specification
 ..........................
 

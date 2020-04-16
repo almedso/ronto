@@ -12,7 +12,7 @@ import ronto.cli.build
 import ronto.cli.all
 import ronto.cli.docker
 
-from ronto.model import read_rontofile
+from ronto.model import read_rontofile, VersionError
 
 
 def format_exception(e):
@@ -64,11 +64,16 @@ def main():
         ronto.set_verbosity(args.verbose)
         ronto.set_dryrun(args.dryrun)
         ronto.model.set_variables(args.env)
-        read_rontofile(args.file)
+        try:
+            read_rontofile(args.file)
+        except VersionError:
+             print(f"Unsupported version of ronto.yml file")
+             sys.exit(1)
+
         if 'func' in args:
-                args.func(args)
+            args.func(args)
         else:
-                parser.print_help()
+            parser.print_help()
     except Exception as e:
         print("")
         print("Oh, Oh - No good :-( This is not supposed to happen.")

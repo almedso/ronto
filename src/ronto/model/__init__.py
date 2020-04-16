@@ -31,6 +31,22 @@ def read_rontofile(file):
     verbose("Read ronto.yml")
     model_ = yaml.load(file, Loader=yaml.FullLoader)
     update_defaults()
+    check_version(get_value(['version'], model_))
+
+
+class VersionError(Exception):
+    pass
+
+
+def check_version(version):
+    if version != None:
+        try:
+            verbose(f"Check rontofile version {version}")
+            int_version = int(version)
+            if int_version > 1:
+                raise VersionError()
+        except ValueError:
+            raise VersionError()
 
 
 def env_val(key, value):
@@ -117,6 +133,9 @@ def get_value(descriptor: List[str], model=None):
         # just one entry left all other cases handled
         if isinstance(m, list):
             # lists are handled outside, thus return as they are
+            return m
+        if isinstance(m, int) or isinstance(m, float) or isinstance(m, bool):
+            # primitives do not require var replacement
             return m
         if isinstance(m, str):
             return _potentially_replace_by_var(m)

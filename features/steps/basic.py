@@ -42,11 +42,20 @@ def step_impl(context, finally_, cli):
         rontofile = ['--file', context.rontofile ]
     command = COMMAND + rontofile + cli.split()
     context.command = command
-    output = subprocess.check_output(command)
-    context.output = output.decode().split('\n')
+    try:
+        output = subprocess.check_output(command)
+        context.output = output.decode().split('\n')
+    except subprocess.CalledProcessError as err:
+        context.exitcode = err.returncode
+        context.output = err.output.decode().split('\n')
     if hasattr(context, 'rontofile') and finally_:
         # cleanup temporary rontofile after command was running "finally"
         os.remove(context.rontofile)
+
+
+@then('the exit code indicates an error')
+def step_impl(context):
+    assert hasattr(context, 'exitcode')
 
 
 @then(u'ronto prints "{version}"')
