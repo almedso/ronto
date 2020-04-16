@@ -79,9 +79,7 @@ class InteractiveContext:
 
 class BatchContext:
     def __init__(self, source_line):
-        self.process = subprocess.Popen(
-            "bash", preexec_fn=os.setsid, stdin=subprocess.PIPE
-        )
+        self.process = subprocess.Popen( "bash", stdin=subprocess.PIPE)
         verbose(f"Start Bash session: Pid {self.process.pid}")
         self.run_context(source_line)
 

@@ -5,7 +5,7 @@ import os
 from ronto import verbose
 from .fetch import process as fetch_process
 from .init import init_process
-from .build import process as build_process
+from .build import build_process
 
 
 def process(args):
@@ -13,10 +13,10 @@ def process(args):
     fetch_process(args)
     args.rebuild_conf = False
     args.clean_build = False
-    args.overwrite_site = False
+    args.clean_conf = False
     init_process(args)
     args.interactive = False
-    args.targets = ""
+    args.tty = False
     build_process(args)
 
 
