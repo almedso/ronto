@@ -48,6 +48,10 @@ That **ronto.yml** is supposed to be located in the very same directory.
 An alternative **ronto.yml** can be given by *-f* or *--file*
 global option.
 
+.. include:: commands.rst
+
+.. _ronto-file:
+
 .. include:: rontofile.rst
 
 .. include:: ../../../CHANGELOG.rst

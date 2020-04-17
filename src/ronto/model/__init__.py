@@ -109,13 +109,18 @@ def update_defaults():
             variables_[default] = env_val(default, model_["defaults"][default])
 
 
-def get_value(descriptor: List[str], model=None):
+def exists(descriptor: List[str], model=None):
+    return get_value(descriptor, model, check_exists=True)
+
+
+def get_value(descriptor: List[str], model=None, check_exists=False):
     """
-    Get a value from the model specification (as read from Rontofile)
+    Get a value from the model specification (as read from ronto.yml)
 
     * Strings in the descriptor denote keys in a directory
     * injecting the model allows to parse sub areas obtained
     * from returned lists
+    * Function acts also like an element exist checker.
     """
     if model == None:
         model = model_
@@ -129,6 +134,9 @@ def get_value(descriptor: List[str], model=None):
             # recursive call
             return get_value(descriptor[1:], m)
 
+        # here the value exists
+        if check_exists:
+            return True
         # just one entry left all other cases handled
         if isinstance(m, list):
             # lists are handled outside, thus return as they are
@@ -138,6 +146,8 @@ def get_value(descriptor: List[str], model=None):
             return m
         if isinstance(m, str):
             return _potentially_replace_by_var(m)
+    if check_exists:
+        return False
     return None
 
 def get_value_with_default(descriptor: List[str], default=None , model=None):

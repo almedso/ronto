@@ -21,9 +21,23 @@ def set_verbosity(flag):
     verbose_flag = flag
 
 
+def is_in_docker():
+    path = "/proc/self/cgroup"
+    return (
+        os.path.exists("/.dockerenv")
+        or os.path.isfile(path)
+        and any("docker" in line for line in open(path))
+    )
+
 def verbose(*args):
+    verbose_marker = "--* "
+    path = "/proc/self/cgroup"
+    if is_in_docker():
+        # use a different marker if container
+        verbose_marker = "*** "
+
     if verbose_flag:
-        print("*** " + "".join(map(str, args)))
+        print(verbose_marker + "".join(map(str, args)))
 
 
 def set_dryrun(flag):

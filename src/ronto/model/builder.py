@@ -33,7 +33,7 @@ class InteractiveContext:
     def __init__(self, source_line):
         # establish the command
         command = ["bash", "-c", f"{source_line}; $SHELL"]
-        verbose(f"bash -c {command}")
+        verbose(f"{command}")
 
         # save original tty setting then set it to raw mode
         self.old_tty = termios.tcgetattr(sys.stdin)
@@ -51,13 +51,14 @@ class InteractiveContext:
         )
         # carridge return is required due to change terminal discipline
         verbose(f"Start Bash session: Pid {self.process.pid}\r")
-        os.write(self.master_fd, b"export PS1='(yocto interactive build)> '\n")
+        os.write(self.master_fd, b"export PS1='$PSADD(i*e b*d)> '\n")
 
     def run_context(self):
         # carridge return is required due to change terminal discipline
         verbose(f"run context\r")
         while self.process.poll() is None:
-            r, w, e = select.select([sys.stdin, self.master_fd], [], [])
+            r, w, e = select.select([sys.stdin, self.master_fd], [],
+                                    [sys.stdin, self.master_fd])
             if sys.stdin in r:
                 d = os.read(sys.stdin.fileno(), 10240)
                 os.write(self.master_fd, d)
@@ -65,6 +66,8 @@ class InteractiveContext:
                 o = os.read(self.master_fd, 10240)
                 if o:
                     os.write(sys.stdout.fileno(), o)
+            if sys.stdin in e or self.master_fd in e:
+                break
 
     def terminate(self):
         self.process.communicate()  # wait until exit is processed

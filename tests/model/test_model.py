@@ -1,7 +1,7 @@
 import pytest
 
 import ronto.model
-from ronto.model import _potentially_replace_by_var, get_value
+from ronto.model import _potentially_replace_by_var, get_value, exists
 
 
 def test_get_model():
@@ -65,3 +65,18 @@ def test_get_value__fail():
     assert None  == get_value(['foo', 'foobar'], model=model)
     assert None  == get_value(['bar', 'foobar'], model=model)
     assert None  == get_value(['foo', 'bar', 'foo'], model=model)
+
+def test_exists__ok():
+    model = {
+        'foo': {'bar': 'foobar', 'foo': '{{FOO}}'},
+        'bar': {'foo': {'foo': [1, 2, 3]}}
+    }
+    ronto.model.cli_variables_ = {
+        'FOO': 'bar'
+    }
+    assert exists (['foo', 'bar'], model=model)
+    assert exists (['foo',], model=model)
+    assert exists (['foo', 'bar'], model=model)
+    assert not exists (['foo', 'bar', 'buf'], model=model)
+    assert not exists (['foo', 'buf'], model=model)
+    assert not exists (['buf'], model=model)
