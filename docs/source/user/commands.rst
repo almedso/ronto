@@ -136,3 +136,74 @@ For convenience it is possible to cleanup docker by:
 .. code :: console
 
     ronto docker --rm-priv-image pwd
+
+.. _command-run:
+
+Run Ronto Scripts
+.................
+
+like *npm* does, *ronto* offers a script execution with the *run* command.
+
+.. code :: console
+
+    $ ronto run
+
+looks for the default script named *all* (borrowed from make) and runs that
+script. if *all* is not defined in the *ronto.yml* file, it assumes the
+following default for all.
+
+.. code :: yaml
+
+    scripts:
+      all:
+        - fetch
+        - init --clean-conf
+        - build
+
+Thus, all will execute three steps by calling*ronto fetch*,
+*ronto --clean-conf* and *build*  as sub-processes sequencially.
+
+It will stop after an error and not continue any further steps.
+
+Environment variables will be passed on. and so would global settings like
+verbosity flag, dry-run flag or the set of command line variables.
+injections.
+
+It is possible to use environment variables or to set variables. The following
+example shows how it works.
+
+scripts do not have options. Any required variability can be easily addressed
+by injecting command line variables prior the name of the run <script> command.
+
+.. code :: console
+
+    defaults:
+      INTEGRATION: default
+      RELEASE: stable
+      MANIFEST: default
+    repo:
+      url: git@github.com:almedso/repo-yocto.git
+      manifest: {{ MANIFEST }}.xml
+    build: sources/ams/conf/{{ TARGET }}.yml
+    scripts:
+      release:
+        - "--env MANIFEST={{ RELEASE }} fetch --force"
+        - "init  --rm-build"
+        - "--env TARGET={{ RELEASE }} build --publish"
+      integration:
+        - "--env MANIFEST={{ INTEGRATION }} fetch --force"
+        - "init  --rm-conf"
+        - "--env TARGET={{ INTEGRATION }} build --publish"
+
+E.g the release script can be run like
+
+.. code :: console
+
+    $ ronto -env RELEASE=2020-04 run release
+
+It runs release script and uses *2020-04* as *RELEASE* environment variable.
+The variable is used to pick appropriate manifest files to pull the sources
+and would select 2020-04 targets as being subject for a release.
+
+
+

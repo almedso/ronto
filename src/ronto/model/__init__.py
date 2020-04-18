@@ -88,7 +88,7 @@ def _potentially_replace_by_var_single(data):
     return data
 
 
-def _potentially_replace_by_var(data):
+def potentially_replace_by_var(data):
     # we need to support two replacements
     # so just call the single replacement twice
     return _potentially_replace_by_var_single(
@@ -145,7 +145,7 @@ def get_value(descriptor: List[str], model=None, check_exists=False):
             # primitives do not require var replacement
             return m
         if isinstance(m, str):
-            return _potentially_replace_by_var(m)
+            return potentially_replace_by_var(m)
     if check_exists:
         return False
     return None

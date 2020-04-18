@@ -9,7 +9,7 @@ import ronto
 import ronto.cli.fetch
 import ronto.cli.init
 import ronto.cli.build
-import ronto.cli.all
+import ronto.cli.run
 import ronto.cli.docker
 
 from ronto.model import read_rontofile, VersionError, set_variables
@@ -57,7 +57,7 @@ def main():
         ronto.cli.fetch.add_command(subparsers)
         ronto.cli.init.add_command(subparsers)
         ronto.cli.build.add_command(subparsers)
-        ronto.cli.all.add_command(subparsers)
+        ronto.cli.run.add_command(subparsers)
         ronto.cli.docker.add_command(subparsers)
 
         args = parser.parse_args()
