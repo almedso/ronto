@@ -3,7 +3,7 @@ Feature: Ronto basic stuff
 Scenario: cli version
     Given ronto is installed
     When I enter "--version"
-    Then ronto prints "1.1.0"
+    Then ronto prints "1.2.0"
 
 Scenario: cli version
     Given a rontofile content as
