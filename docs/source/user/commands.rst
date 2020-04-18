@@ -90,7 +90,7 @@ ronto-file-docker_ section.
 There is a dedicated *ronto docker* command that allows running
 own command in the build container.
 
-.. code :: yaml
+.. code :: console
 
     ronto docker --help
     ronto docker ls  # list content of project folder
@@ -99,33 +99,40 @@ own command in the build container.
 As without docker it is possible to run an bitbake tasks interactively
 within a sourced Yocto environment like
 
-.. code :: yaml
+.. code :: console
 
     ronto build --interactive
 
 This is the same as:
 
-.. code :: yaml
+.. code :: console
 
     ronto docker --interactive 'ronto build -i'
+
+.. note ::
+
+   Interactive session can be finished by typing *exit* command in bash.
+   It might be possible that entering *exist* is required multiple times
+   if docker exec bash calls e.g ronto command and ronto itself
+   invokes a bash again for interactive building.
 
 For convenience it is possible to cleanup docker by:
 
 * Remove the build container:
 
-.. code :: yaml
+.. code :: console
 
     ronto docker --rm-container pwd  # pwd is just a short arbitrary command
 
 * Remove the build container, the privatized image
 
-.. code :: yaml
+.. code :: console
 
     ronto docker --rm-priv-image pwd
 
 * Remove the build container, the privatized image and also the pulled big
   image that contains the yocto prerequisite tools.
 
-.. code :: yaml
+.. code :: console
 
     ronto docker --rm-priv-image pwd
