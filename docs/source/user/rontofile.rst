@@ -159,14 +159,52 @@ the build artifact.
 Publishing
 ..........
 
+Different targets are possible and useful.
+Publishing happens to certain web URL's that are provided
+by a web server. on the backend site those urls are mapped
+to a publishing base directory.
+
+* *image artifacts* are needed for initial installation.
+* *package artifacts* are needed for individual package update
+  via package management.
+
+Furthermore, publishing of root filesystems via nfs as well
+as and kernels and device trees via tftp boot protocol.
+is usefully during development.
+
+
 .. code :: yaml
 
-    ## -- Not implemented yet --
-    ## Package publishing
+    ## Publishing of packages and
+    ## if set 'publish_package is defined packageing actions are performed
     publish:
-      host_directory: xxx
-      package_feed_host: {{ PACKAGE_FEED_HOST }}
-      copy_base_url: {{ PUBLISH_BASE_URL }}
+      ## directory where packages will be sent to.
+      ## must be an absolute path
+      ## if in docker part of the publish volume
+      ## if not set - and docker is configured this is equal
+      ## to docker: -> publish_dir: -> container
+      webserver_host_dir: xxx
+      ## relative path extension to webserver_host_dir
+      ## pointing to package feed root
+      ## if set -> build output of packages packages are "rsynced" to that folder
+      package_dir: feeds  ## default feeds
+      ## relative path extension to webserver_host_dir
+      ## pointing to image folder root
+      ## if set targets with publish flag are copied over there
+      image_dir: images  ## default images
+
+.. note ::
+
+    Package index has to be computed during build. If not configured by
+
+    .. code :: yaml
+
+        build:
+          packageindex:
+
+    publishing of packages will be suppressed.
+  
+
 
 .. _ronto-file-docker:
 

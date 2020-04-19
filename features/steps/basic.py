@@ -75,10 +75,10 @@ def step_impl(context):
     if hasattr(context, 'command'):
         print(f"Command run: {context.command}")
     expected = context.text.split('\n')
-    print(f"expected: {expected}")
     assert hasattr(context, 'output')
-    print(f"output: {context.output}")
+    print(f"length Exp: {len(expected)} Out: {len(context.output)}")
     assert len(context.output) >= len(expected)
     for i in range(len(expected)):
-        print(f"Index: {i}, {expected[i]}")
+        print(f"Exp at({i}):, {expected[i]}")
+        print(f"Out at({i}):, {context.output[i]}")
         assert match_line(expected[i], context.output[i])

@@ -5,6 +5,7 @@ Scenario: no targets defined
     Given a rontofile content as
         """
         build:
+          packageindex: true
         """
     When I finally enter "--dryrun --verbose build"
     Then ronto prints
@@ -26,7 +27,6 @@ Scenario: no targets defined
         dry - Run build command: MACHINE=qemux86 bitbake core-image-sato
         \* Do package index
         dry - Run build command: bitbake package-index
-        dry - Run build command: exit
         \* Docker decorator - done
         """
 
@@ -35,7 +35,6 @@ Scenario: in ronto.yml two targets and no package-index defined
     Given a rontofile content as
         """
         build:
-          packageindex: False
           targets:
             - image: bar-1
               machine: foo-1
@@ -63,7 +62,6 @@ Scenario: in ronto.yml two targets and no package-index defined
         \* Build bar-2 for foo-2
         \**
         dry - Run build command: MACHINE=foo-2 bitbake bar-2
-        dry - Run build command: exit
         \* Docker decorator - done
         """
 

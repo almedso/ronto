@@ -9,6 +9,7 @@ import ronto
 import ronto.cli.fetch
 import ronto.cli.init
 import ronto.cli.build
+import ronto.cli.publish
 import ronto.cli.run
 import ronto.cli.docker
 
@@ -57,6 +58,7 @@ def main():
         ronto.cli.fetch.add_command(subparsers)
         ronto.cli.init.add_command(subparsers)
         ronto.cli.build.add_command(subparsers)
+        ronto.cli.publish.add_command(subparsers)
         ronto.cli.run.add_command(subparsers)
         ronto.cli.docker.add_command(subparsers)
 

@@ -25,7 +25,7 @@ import yaml
 
 from ronto import verbose, dryrun
 from .init import get_init_build_dir, get_init_script
-from ronto.model import get_value, get_value_with_default
+from . import get_value, get_value_with_default
 
 
 class InteractiveContext:
@@ -73,8 +73,9 @@ class InteractiveContext:
         verbose(f"Stop bash session: Pid {self.process.pid}")
 
     def __del__(self):
-        # restore tty settings back
-        self.process.kill()
+        if hasattr(self, 'process'):
+            self.process.kill()
+
 
 
 class BatchContext:
@@ -113,8 +114,8 @@ class BatchContext:
             verbose(f"Stop bash session: Pid {self.process.pid}")
 
     def __del__(self):
-        # restore tty settings back
-        self.process.kill()
+        if hasattr(self, 'process'):
+            self.process.kill()
 
 
 class Builder:
@@ -187,7 +188,7 @@ class TargetBuilder(Builder):
         super().__init__()
         self.targets = get_targets(targets_file)
         self.do_packageindex = get_value_with_default(
-            ["build", "packageindex"], True)
+            ["build", "packageindex"])
         self.context = BatchContext(self.source_line)
 
     def build(self):
