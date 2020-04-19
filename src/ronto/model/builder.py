@@ -19,6 +19,7 @@ import array
 import tty
 import pty
 import subprocess
+from threading import Thread
 import yaml
 
 
@@ -68,12 +69,8 @@ class InteractiveContext:
                     os.write(sys.stdout.fileno(), o)
             if sys.stdin in e or self.master_fd in e:
                 break
-
-    def terminate(self):
-        self.process.communicate()  # wait until exit is processed
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.old_tty)
         verbose(f"Stop bash session: Pid {self.process.pid}")
-        self.process.terminate()  # maybe that is too much
 
     def __del__(self):
         # restore tty settings back
@@ -82,26 +79,41 @@ class InteractiveContext:
 
 class BatchContext:
     def __init__(self, source_line):
-        self.process = subprocess.Popen( "bash", stdin=subprocess.PIPE)
-        verbose(f"Start Bash session: Pid {self.process.pid}")
-        self.run_context(source_line)
+        self.source_line = source_line
+
+    def inject_command(self, command):
+        if command != '':
+            verbose(f"Run command: {command}")
+            composed_cmd = self.source_line + '\n'
+            self.process.stdin.write(composed_cmd.encode())
+            composed_cmd = command + '\n'
+            self.process.stdin.write(composed_cmd.encode())
+            composed_cmd = 'exit\n'
+            self.process.stdin.write(composed_cmd.encode())
+            composed_cmd = 'exit\n'
+            self.process.stdin.write(composed_cmd.encode())
+
+    def wait_and_print_output(self):
+        self.process.communicate()
 
     def run_context(self, command):
         if dryrun():
             print(f"dry - Run build command: {command}")
         else:
-            verbose(f"Run command: {command}")
-            command += "\n"
-            self.process.stdin.write(command.encode())
-
-    def terminate(self):
-        self.run_context("exit")
-        self.process.communicate()  # wait until exit is processed
-        verbose(f"Stop bash session: Pid {self.process.pid}")
-        self.process.terminate()  # maybe that is to much
+            try:
+                self.process = subprocess.Popen( "bash",
+                    stdin=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    )
+                verbose(f"Start Bash session: Pid {self.process.pid}")
+                self.inject_command(command)
+                self.process.communicate()
+            except subprocess.SubprocessError:
+                pass
+            verbose(f"Stop bash session: Pid {self.process.pid}")
 
     def __del__(self):
-        # to be sure not leaving any zombies
+        # restore tty settings back
         self.process.kill()
 
 
@@ -190,7 +202,6 @@ class TargetBuilder(Builder):
         if self.do_packageindex:
             verbose("Do package index")
             self.context.run_context("bitbake package-index")
-        self.context.terminate()
 
     def list_targets(self):
         for target in self.targets:
@@ -205,4 +216,3 @@ class InteractiveBuilder(Builder):
 
     def build(self):
         self.context.run_context()
-        self.context.terminate()  # it waits until the interactive session ends

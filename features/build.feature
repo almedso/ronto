@@ -20,8 +20,6 @@ Scenario: no targets defined
         \* Check for targets directly defined in 'ronto.yml'
         \* Verify target specifications
         \*   No verified target found -> use default target
-        \* Start Bash session: Pid
-        dry - Run build command: source sources/poky/oe-init-build-env build
         \**
         \* Build core-image-sato for qemux86
         \**
@@ -29,7 +27,6 @@ Scenario: no targets defined
         \* Do package index
         dry - Run build command: bitbake package-index
         dry - Run build command: exit
-        \* Stop bash session: Pid
         \* Docker decorator - done
         """
 
@@ -58,8 +55,6 @@ Scenario: in ronto.yml two targets and no package-index defined
         \* Builder init sourcing: source sources/poky/oe-init-build-env build
         \* Check for targets directly defined in 'ronto.yml'
         \* Verify target specifications
-        \* Start Bash session: Pid
-        dry - Run build command: source sources/poky/oe-init-build-env build
         \**
         \* Build bar-1 for foo-1
         \**
@@ -69,7 +64,6 @@ Scenario: in ronto.yml two targets and no package-index defined
         \**
         dry - Run build command: MACHINE=foo-2 bitbake bar-2
         dry - Run build command: exit
-        \* Stop bash session: Pid
         \* Docker decorator - done
         """
 
@@ -104,8 +98,6 @@ Scenario: targets defined per file reference
         \* Builder init sourcing: source sources/poky/oe-init-build-env build
         \* Read targets from file: sources/my-targets.yml
         \* Verify target specifications
-        \* Start Bash session: Pid
-        dry - Run build command: source sources/poky/oe-init-build-env build
         \**
         \* Build bar-1 for foo-1
         \**
@@ -116,7 +108,5 @@ Scenario: targets defined per file reference
         dry - Run build command: MACHINE=foo-2 bitbake bar-2
         \* Do package index
         dry - Run build command: bitbake package-index
-        dry - Run build command: exit
-        \* Stop bash session: Pid
         \* Docker decorator - done
         """
