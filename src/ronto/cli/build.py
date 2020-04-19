@@ -13,11 +13,14 @@ from .init import init_process
 @docker_context()
 def build_process(args):
     verbose("Process build command")
-    if args.interactive:
+    if args.interactive and not args.list_targets:
         builder = InteractiveBuilder()
     else:
         builder = TargetBuilder()
-    builder.build()
+    if args.list_targets:
+        builder.list_targets()
+    else:
+        builder.build()
 
 def process(args):
     if args.fetch:
@@ -44,6 +47,13 @@ def add_command(subparser):
         help="Run fetch command (with forced option) before build",
         action="store_true",
     )
+    parser.add_argument(
+        "-l", "--list-targets",
+        help="List all targes that are subject to 'batch' build" \
+             " - it overwrites --interactive option",
+        action="store_true",
+    )
+
     parser.add_argument(
         "--init",
         help="Run init command (with clean_conf option) before build",

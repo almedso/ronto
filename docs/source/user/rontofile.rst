@@ -112,7 +112,8 @@ as well as what kind of clean is applied before building.
       ## <build_dir>/conf/site.conf is used to establish site specific settings
       ## Use an alternative file to establish <build_dir>/conf/site.conf
       ## Default is site.conf in project root directory
-      site_conf_file: site.conf ## path is relative to project root directory
+      site:
+        file: site.conf ## path is relative to project root directory
 
 Build Targets
 .............

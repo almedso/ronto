@@ -220,22 +220,28 @@ class DockerHost:
             self.run_interactive_build_command(command)
         else:
             self.run_batch_command(command)
-        verbose(f"Docker host - command '{command}' finished")
+        if isinstance(command, list):
+            command = ' '.join(command)
+        verbose(f"Docker command '{command}' finished - returned to host")
 
 
     def run_batch_command(self, command):
-        verbose(f"Docker host - run batch command '{command}'")
+        if isinstance(command, list):
+            cmd_fmt = ' '.join(command)
+        else:
+            cmd_fmt = command
+        verbose(f"Docker host - run batch command '{cmd_fmt}'")
         if dryrun():
-            print(f"dry: (batch-in-container) {command}")
+            print(f"dry: (batch-in-container) {cmd_fmt}")
         else:
             socket = self.container.exec_run(cmd=command, stream=True,
                         demux=True, workdir=self.config.project_dir_container)
             for (stdout, stderr) in socket.output:
                 if stdout:
-                    sys.stdout.buffer.write(b'.')
+                    sys.stdout.buffer.write(b'... ')
                     sys.stdout.buffer.write(stdout)
                 if stderr:
-                    sys.stderr.buffer.write(b'+')
+                    sys.stderr.buffer.write(b'+++ ')
                     sys.stderr.buffer.write(stderr)
 
     def run_interactive_build_command(self, command):

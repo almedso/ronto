@@ -180,7 +180,10 @@ class TargetBuilder(Builder):
 
     def build(self):
         for target in self.targets:
-            verbose(f"Build {target['image']} for {target['machine']}")
+            # print instead of verbose since bitbake is verbose anyway
+            print(f"****************************************************")
+            print(f"* Build {target['image']} for {target['machine']}")
+            print(f"****************************************************")
             self.context.run_context(
                 f"MACHINE={target['machine']} bitbake {target['image']}"
             )
@@ -188,6 +191,10 @@ class TargetBuilder(Builder):
             verbose("Do package index")
             self.context.run_context("bitbake package-index")
         self.context.terminate()
+
+    def list_targets(self):
+        for target in self.targets:
+            print(f"Machine: {target['machine']} Image: {target['image']}")
 
 
 class InteractiveBuilder(Builder):

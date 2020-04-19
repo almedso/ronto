@@ -22,7 +22,9 @@ Scenario: no targets defined
         \*   No verified target found -> use default target
         \* Start Bash session: Pid
         dry - Run build command: source sources/poky/oe-init-build-env build
+        \**
         \* Build core-image-sato for qemux86
+        \**
         dry - Run build command: MACHINE=qemux86 bitbake core-image-sato
         \* Do package index
         dry - Run build command: bitbake package-index
@@ -58,9 +60,13 @@ Scenario: in ronto.yml two targets and no package-index defined
         \* Verify target specifications
         \* Start Bash session: Pid
         dry - Run build command: source sources/poky/oe-init-build-env build
+        \**
         \* Build bar-1 for foo-1
+        \**
         dry - Run build command: MACHINE=foo-1 bitbake bar-1
+        \**
         \* Build bar-2 for foo-2
+        \**
         dry - Run build command: MACHINE=foo-2 bitbake bar-2
         dry - Run build command: exit
         \* Stop bash session: Pid
@@ -100,9 +106,13 @@ Scenario: targets defined per file reference
         \* Verify target specifications
         \* Start Bash session: Pid
         dry - Run build command: source sources/poky/oe-init-build-env build
+        \**
         \* Build bar-1 for foo-1
+        \**
         dry - Run build command: MACHINE=foo-1 bitbake bar-1
+        \**
         \* Build bar-2 for foo-2
+        \**
         dry - Run build command: MACHINE=foo-2 bitbake bar-2
         \* Do package index
         dry - Run build command: bitbake package-index

@@ -1,7 +1,7 @@
 import pytest
 
 import ronto.model
-from ronto.model import _potentially_replace_by_var, get_value, exists
+from ronto.model import potentially_replace_by_var, get_value, exists
 
 
 def test_get_model():
@@ -9,38 +9,38 @@ def test_get_model():
     assert ronto.model.model_ == model
 
 
-def test_potentially_replace_by_var__no_match():
-    assert 'foo' == _potentially_replace_by_var('foo')
-    assert 'foo {{  }}' == _potentially_replace_by_var('foo {{  }}')
+def testpotentially_replace_by_var__no_match():
+    assert 'foo' == potentially_replace_by_var('foo')
+    assert 'foo {{  }}' == potentially_replace_by_var('foo {{  }}')
 
-def test_potentially_replace_by_var__successful_match():
+def testpotentially_replace_by_var__successful_match():
     ronto.model.cli_variables_ = {
         'FOO': 'bar'
     }
-    assert 'bar' == _potentially_replace_by_var('{{FOO}}')
-    assert 'bar' == _potentially_replace_by_var('{{ FOO }}')
-    assert 'bar' == _potentially_replace_by_var('{{  FOO  }}')
-    assert 'bar' == _potentially_replace_by_var('{{  FOO}}')
-    assert 'bar' == _potentially_replace_by_var('{{FOO  }}')
+    assert 'bar' == potentially_replace_by_var('{{FOO}}')
+    assert 'bar' == potentially_replace_by_var('{{ FOO }}')
+    assert 'bar' == potentially_replace_by_var('{{  FOO  }}')
+    assert 'bar' == potentially_replace_by_var('{{  FOO}}')
+    assert 'bar' == potentially_replace_by_var('{{FOO  }}')
 
-    assert ' bar ' == _potentially_replace_by_var(' {{ FOO }} ')
-    assert 'foo bar foo' == _potentially_replace_by_var('foo {{ FOO }} foo')
-    assert 'bar foo' == _potentially_replace_by_var('{{FOO  }} foo')
-    assert 'foo bar' == _potentially_replace_by_var('foo {{ FOO }}')
+    assert ' bar ' == potentially_replace_by_var(' {{ FOO }} ')
+    assert 'foo bar foo' == potentially_replace_by_var('foo {{ FOO }} foo')
+    assert 'bar foo' == potentially_replace_by_var('{{FOO  }} foo')
+    assert 'foo bar' == potentially_replace_by_var('foo {{ FOO }}')
 
-def test_potentially_replace_by_var__missing_var():
+def testpotentially_replace_by_var__missing_var():
     with pytest.raises(Exception):
-        _potentially_replace_by_var('{{BAR}}')
+        potentially_replace_by_var('{{BAR}}')
 
 
-def test_potentially_replace_by_two_vars__successful_match():
+def testpotentially_replace_by_two_vars__successful_match():
     ronto.model.cli_variables_ = {
         'FOO': 'foo',
         'BAR': 'bar'
     }
-    assert 'foobar' == _potentially_replace_by_var('{{FOO}}{{BAR}}')
-    assert 'foobar' == _potentially_replace_by_var('{{ FOO }}{{ BAR }}')
-    assert ' foo x bar ' == _potentially_replace_by_var(' {{ FOO }} x {{ BAR }} ')
+    assert 'foobar' == potentially_replace_by_var('{{FOO}}{{BAR}}')
+    assert 'foobar' == potentially_replace_by_var('{{ FOO }}{{ BAR }}')
+    assert ' foo x bar ' == potentially_replace_by_var(' {{ FOO }} x {{ BAR }} ')
 
 
 def test_get_value__ok():

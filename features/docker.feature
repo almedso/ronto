@@ -31,7 +31,7 @@ Scenario:
         dry: Start container: my-yocto-bitbaker-
         \* Docker host - run interactive command 'bash'
         dry: \(interactive-in-container\) bash
-        \* Docker host - command 'bash' finished
+        \* Docker command 'bash' finished - returned to host
         dry: Stop container: my-yocto-bitbaker-
         """
 
