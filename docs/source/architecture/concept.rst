@@ -177,3 +177,88 @@ maintained in that repository as well.
 
    Late loading must be implemented, since it might be possible that this
    specification is only or updated available after the fetching step
+
+
+Cleanup flags
+-------------
+
+E.g. in rontofile:
+
+.. code :: yaml
+
+    build:
+      flags:
+        - cleanconf
+        - cleanbuild
+        - cleansstate
+
+
+Solution:
+.........
+
+Are part of init sub-command
+can be customized into *ronto*scripts.
+
+
+Command line variables
+----------------------
+
+Like reading from environment it is possibible to
+read from command line (as global parameter)
+
+
+Compose of own Commands
+-----------------------
+
+Allow custom commands (including options + injections)
+like git config alias.xxx "blablub"
+
+.. code :: yaml
+
+   scripts:
+     do-special:
+       - '--env REPO=foo fetch'
+       - '-f integrate.yml build'
+       - '-f integrate.yml publish'
+
+Pro:
+
+* more flexibility to handle e.g. process specifics of
+  integration builds or release builds
+* support of customized developer workflows / development cycles
+
+Con:
+
+* more complexity
+
+Solution:
+
+* is implemented as proposed
+  redesigned as run command and scripts section.
+
+
+Multiple prioritized config files
+---------------------------------
+
+* Must be given at command line. Later on the command line implies
+  higher priority.
+* Items at higher priority overwrite items with lower priority.
+  (same mechanism like css)
+
+Pro:
+
+* flexibility
+* homogeneous handling
+* little effort
+
+Con:
+
+* Overwrite rules are not super intuitive
+* Concepts are not easily readable
+* (like salt: Problem solving if you only have a hammer,
+  everything turns a nail)
+
+Solution:
+
+* same thing is achived via extra "scripts" section, variable substituion,
+  and include e.g. of target file.

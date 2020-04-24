@@ -5,7 +5,7 @@ Generate site.conf
 ------------------
 
 Pro:
-  - inteligent mapping between docker and none docker directories
+  - intelligent mapping between docker and none docker directories
   - no additional file to store
 Con:
   - one more concept
@@ -23,24 +23,6 @@ Con:
         distro: "{{ ams }}"
 
 
-Cleanup flags
--------------
-
-To clarify if overwrite on command line should be possible
-
-.. code :: yaml
-
-    build:
-      flags:
-        - cleanconf
-        - cleanbuild
-        - cleansstate
-
-Command line variables
-----------------------
-
-Like reading from environment it is possibible to
-read from command line (as global parameter)
 
 .. code :: console
 
@@ -55,49 +37,3 @@ Pro:
 Con:
 
 * little more effort
-
-
-Compose of own Commands
------------------------
-
-Allow custom commands (including options + injections)
-like git config alias.xxx "blablub"
-
-.. code :: yaml
-
-   commands:
-     do-special:
-       - '-f integrate.yml fetch'
-       - '-f integrate.yml build'
-       - '-f integrate.yml publish'
-
-Pro:
-
-* more flexibility to handle e.g. process specifics of
-  integration builds or release builds
-* support of customized developer workflows / development cycles
-
-Con:
-
-* more complexity
-
-Multiple prioritized config files
----------------------------------
-
-* Must be given at command line. Later on the command line implies
-  higher priority.
-* Items at higher priority overwrite items with lower priority.
-  (same mechanism like css)
-
-Pro:
-
-* flexibility
-* homogeneous handling
-* little effort
-
-Con:
-
-* Overwrite rules are not super intuitive
-* Concepts are not easily readable
-* (like salt: Problem solving if you only have a hammer,
-  everything turns a nail)

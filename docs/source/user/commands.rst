@@ -1,6 +1,41 @@
 Ronto Commands
 ==============
 
+.. _command-bootstrap:
+
+Bootstrap
+.........
+
+**ronto** simplifies the process of starting from scratch by bootstrapping
+initial *ronto.yml* file and also a *site.conf* configuration.
+
+This bootstrapping ends up in essential consistent settings.
+**ronto** can manage different sources of configuration and recipes.
+
+* do not manage at all - *ignore* option
+* use a set of git repository specification - *git* option
+* use repotool and manifest repository specification - *repo* option
+
+Also, the build process runs
+
+* either in a docker container
+* or bare metal.
+
+While bootstrapping those two orthogonal parameter ranges are considered.
+Such that the set of user questions are minimized and tailored according to
+those two parameters.
+
+e.g. by invoking:
+
+.. code :: console
+
+   # get an idea
+   ronto bootstrap --help
+   # use manifest repository run in docker container
+   ronto bootstrap --source repo --container
+   # do not manage sources and do not run in a container
+   ronto bootstrap -s ignore
+
 .. _command-docker:
 
 Docker

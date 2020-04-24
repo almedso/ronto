@@ -5,6 +5,23 @@ Change Log
 
 Version History
 ---------------
+
+1.4.0
+    * run sub-commands
+    * Documentation update
+
+1.3.0
+    * update docker sub-commands
+    * Documentation update
+
+1.2.0
+    * publish sub-commands
+    * Documentation update
+
+1.1.0
+    * build sub-commands
+    * Documentation update
+
 1.0.0
     * Fetch sub-commands
     * Documentation update

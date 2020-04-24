@@ -18,7 +18,7 @@ It is like Yocto which is the prefix for 10^-24 of something.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :numbered:
    :hidden:
 

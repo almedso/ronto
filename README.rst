@@ -41,7 +41,8 @@ Start and explore with
 .. code-block:: python
 
     # bootstrap a new build Rontofile
-    ronto bootstrap
+    # with a repotool based setup and docker container toolchain
+    ronto bootstrap --source repo --container
 
     # fine grained step by step build
     ronto fetch
@@ -50,5 +51,5 @@ Start and explore with
     ronto publish
 
     # or more compact round-trip (like make all)
-    ronto all
+    ronto run all
 
