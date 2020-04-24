@@ -1,0 +1,72 @@
+# Control the yocto build process via ronto.yml
+#
+# See the full ronto file documentation at:
+# https://ronto.readthedocs.io/en/latest/user/index.html#rontofile-reference
+#
+version: 1
+
+docker:
+  {%- if cookiecutter.docker_image != 'almedso/yocto-bitbaker:latest' %}
+    init_script: {{ cookiecutter.docker_image }}
+  {%- endif %}
+  {%- if cookiecutter.docker_project_dir != '/yocto/root' %}
+  project_dir: {{ cookiecutter.docker_project_dir }}
+  {%- endif %}
+  {%- if cookiecutter.docker_host_cache_dir != '' and cookiecutter.docker_host_cache_dir != ' '  %}
+  cache_dir:
+    host: {{ cookiecutter.docker_host_cache_dir }}
+    container: {{ cookiecutter.docker_container_cache_dir }}
+  {%- endif %}
+  {%- if cookiecutter.docker_host_publish_dir != '' and cookiecutter.docker_host_publish_dir != ' ' %}
+  publish_dir:
+    host: {{ cookiecutter.docker_host_publish_dir }}
+    container: {{ cookiecutter.docker_container_publish_dir }}
+  {%- endif %}
+
+repo:
+  url: {{ cookiecutter.manifest_repository_url }}
+{%- if cookiecutter.manifest != "default.xml" %}
+  manifest: {{ cookiecutter.manifest }}
+{%- endif %}
+{%- if cookiecutter.branch != "master" %}
+  branch: {{ cookiecutter.branch }}
+{%- endif %}
+
+build:
+{%- if cookiecutter.init_script != 'sources/poky/oe-init-build-env' %}
+  init_script: {{ cookiecutter.init_script }}
+{%- endif %}
+{%- if cookiecutter.targets_file == "" %}
+  # targets_file:  # if not defined the defaults is qemux86/core-image-sato
+{%- else %}
+  targets_file: {{ cookiecutter.targets_file }}
+{%- endif %}
+{%- if cookiecutter.build_dir != 'build' %}
+  build_dir: {{ cookiecutter.build_dir }}
+{%- endif %}
+{%- if cookiecutter.template_dir != 'sources/poky/meta-poky/conf' %}
+  template_dir: {{ cookiecutter.template_dir }}
+{%- endif %}
+
+{%+ if cookiecutter.docker_host_publish_dir != '' and  cookiecutter.docker_host_publish_dir != ' ' %}
+publish:
+  webserver_host_dir: {{ cookiecutter.docker_container_publish_dir }}
+{%- if cookiecutter.packages_dir != 'feeds' %}
+  packages_dir: {{ cookiecutter.packages_dir }}
+{%- endif %}
+{%- if cookiecutter.images_dir != 'image' %}
+  images_dir: {{ cookiecutter.images_dir }}
+{%- endif %}
+{% endif %}
+
+scripts:
+  clean:
+    - fetch
+    - init --clean-build
+  all:
+    - fetch
+    - init
+    - build
+{%- if cookiecutter.docker_host_publish_dir != '' and cookiecutter.docker_host_publish_dir != ' ' %}
+    - publish
+{%- endif %}

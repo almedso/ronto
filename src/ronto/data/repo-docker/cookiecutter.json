@@ -1,0 +1,25 @@
+{
+    "project_slug": "",
+
+    "docker_image": "almedso/yocto-bitbaker:latest",
+    "docker_project_dir": "/yocto/root",
+    "docker_host_cache_dir": "",
+    "docker_container_cache_dir": "/yocto/cache",
+
+    "manifest_repository_url": "git@github.com:my-org/my-manifest-repo.git",
+    "manifest": "default.xml",
+    "branch": "master",
+
+    "template_dir": "sources/poky/meta-poky/conf",
+    "init_script": "sources/poky/oe-init-build-env",
+    "build_dir": "build",
+    "targets_file": "",
+
+    "docker_host_publish_dir": "",
+    "docker_container_publish_dir": "/yocto/publish",
+
+    "publish_host": "",
+    "packages_dir": "feeds",
+    "images_dir": "images",
+    "twice_no_of_cores": 8
+}

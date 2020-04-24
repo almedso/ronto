@@ -1,0 +1,16 @@
+{
+    "project_slug": "",
+
+    "template_dir": "sources/poky/meta-poky/conf",
+    "init_script": "sources/poky/oe-init-build-env",
+    "build_dir": "build",
+    "cache_dir": "",
+    "publish_dir": "",
+
+    "targets_file": "",
+
+    "publish_host": "",
+    "packages_dir": "feeds",
+    "images_dir": "images",
+    "twice_no_of_cores": 8
+}

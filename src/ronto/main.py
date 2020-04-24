@@ -12,6 +12,7 @@ import ronto.cli.build
 import ronto.cli.publish
 import ronto.cli.run
 import ronto.cli.docker
+import ronto.cli.bootstrap
 
 from ronto.model import read_rontofile, VersionError, set_variables
 
@@ -55,6 +56,7 @@ def main():
                 help="Print program version")
         subparsers = parser.add_subparsers(help='sub-command help')
 
+        ronto.cli.bootstrap.add_command(subparsers)
         ronto.cli.fetch.add_command(subparsers)
         ronto.cli.init.add_command(subparsers)
         ronto.cli.build.add_command(subparsers)
