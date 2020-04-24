@@ -6,6 +6,10 @@ Change Log
 Version History
 ---------------
 
+1.5.0
+    * bootstrap sub-commands
+    * Documentation update
+
 1.4.0
     * run sub-commands
     * Documentation update
